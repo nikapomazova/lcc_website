@@ -134,8 +134,14 @@
     background:transparent;
     -webkit-tap-highlight-color:transparent;
     touch-action:manipulation;
+    transition:opacity .15s ease;
   }
   .btn:active{ transform:translateY(1px); }
+  .btn:disabled{
+    opacity:.4;
+    cursor:not-allowed;
+    transform:none;
+  }
   .btn-a{ background:rgba(34,197,94,.1); border-color:rgba(34,197,94,.4); color:var(--green); }
   .btn-e{ background:rgba(245,158,11,.1); border-color:rgba(245,158,11,.4); color:var(--amber); }
   .btn-d{ background:rgba(239,68,68,.1); border-color:rgba(239,68,68,.4); color:var(--red); }
@@ -261,6 +267,33 @@
     border-radius:12px;
   }
   .warn-lbl{ color:var(--brand); font-weight:700; }
+
+  .decision-status{
+    display:none;
+    margin-top:12px;
+    padding:10px 12px;
+    border-radius:10px;
+    border:1px solid;
+    font-size:11px;
+    letter-spacing:1px;
+    font-weight:700;
+  }
+  .decision-status.show{ display:block; }
+  .decision-status.submitted{
+    color:var(--green);
+    border-color:rgba(34,197,94,.35);
+    background:rgba(34,197,94,.08);
+  }
+  .decision-status.escalated{
+    color:var(--amber);
+    border-color:rgba(245,158,11,.35);
+    background:rgba(245,158,11,.08);
+  }
+  .decision-status.declined{
+    color:var(--red);
+    border-color:rgba(239,68,68,.35);
+    background:rgba(239,68,68,.08);
+  }
 
   .modal{
     position:fixed;
@@ -399,6 +432,8 @@
         <button class="btn btn-e" type="button" id="escalateBtn">ESCALATE</button>
         <button class="btn btn-d" type="button" id="declineBtn">DECLINE</button>
       </div>
+
+      <div class="decision-status" id="decisionStatus"></div>
     </div>
 
     <div class="section-hdr">AI RISK SCORE</div>
@@ -588,7 +623,9 @@
       dpd: "None",
       late12: "None",
       osfi: "Performing",
-      income: "$142,000"
+      income: "$142,000",
+      locked: false,
+      finalDecision: ""
     },
     mary: {
       name: "Mary Jane",
@@ -596,7 +633,7 @@
       age: 29,
       job: "Registered Nurse",
       province: "British Columbia",
-      score: 61,
+      score: 67,
       verdict: "MEDIUM RISK",
       scoreColor: "#f59e0b",
       rec: "ESCALATE — Solid income but higher LTV and BC market exposure. Recommend additional verification, updated appraisal, and senior review before approval.",
@@ -611,7 +648,9 @@
       dpd: "1x 30-day (last 24M)",
       late12: "1",
       osfi: "Performing",
-      income: "$118,000"
+      income: "$118,000",
+      locked: false,
+      finalDecision: ""
     },
     james: {
       name: "James Bond",
@@ -634,13 +673,17 @@
       dpd: "2x 60-day (last 24M)",
       late12: "2",
       osfi: "Watchlist",
-      income: "$98,000"
+      income: "$98,000",
+      locked: false,
+      finalDecision: ""
     }
   };
 
   const $ = (id) => document.getElementById(id);
   const CIRC = 339.3;
-  let current = profiles.john;
+  let currentKey = "john";
+  let current = profiles[currentKey];
+  let pendingDecisionType = "";
 
   function clamp(n, min, max){
     return Math.max(min, Math.min(max, n));
@@ -671,6 +714,43 @@
     const el = $(elId);
     el.classList.remove("dot-low", "dot-mid", "dot-high");
     el.classList.add(level);
+  }
+
+  function updateDecisionStatus(){
+    const box = $("decisionStatus");
+    box.className = "decision-status";
+
+    if (!current.locked || !current.finalDecision) {
+      box.textContent = "";
+      return;
+    }
+
+    box.classList.add("show", current.finalDecision);
+
+    if (current.finalDecision === "submitted") {
+      box.textContent = "STATUS: SUBMITTED — THIS PROFILE IS LOCKED";
+    } else if (current.finalDecision === "escalated") {
+      box.textContent = "STATUS: ESCALATED — THIS PROFILE IS LOCKED";
+    } else if (current.finalDecision === "declined") {
+      box.textContent = "STATUS: DECLINED — THIS PROFILE IS LOCKED";
+    }
+  }
+
+  function updateActionButtons(){
+    const locked = current.locked;
+    $("approveBtn").disabled = locked;
+    $("escalateBtn").disabled = locked;
+    $("declineBtn").disabled = locked;
+
+    if (locked) {
+      $("approveBtn").textContent = "LOCKED";
+      $("escalateBtn").textContent = "LOCKED";
+      $("declineBtn").textContent = "LOCKED";
+    } else {
+      $("approveBtn").textContent = "APPROVE";
+      $("escalateBtn").textContent = "ESCALATE";
+      $("declineBtn").textContent = "DECLINE";
+    }
   }
 
   function applyProfile(p){
@@ -750,6 +830,9 @@
 
     $("decisionAppId").textContent = p.appId;
     $("decisionName").textContent = p.name;
+
+    updateDecisionStatus();
+    updateActionButtons();
   }
 
   const modal = $("decisionModal");
@@ -760,6 +843,9 @@
   const conditions = $("decisionConditions");
 
   function openDecision(type){
+    if (current.locked) return;
+
+    pendingDecisionType = type;
     modal.classList.add("show");
     finalizeBtn.disabled = false;
 
@@ -804,6 +890,7 @@
 
   function closeDecision(){
     modal.classList.remove("show");
+    pendingDecisionType = "";
   }
 
   modal.addEventListener("click", (e) => {
@@ -814,36 +901,52 @@
   $("backBtn").addEventListener("click", closeDecision);
 
   finalizeBtn.addEventListener("click", () => {
+    if (current.locked) return;
+
     const stamp = new Date().toLocaleString();
 
     if (!notes.value.includes("[Audit]")) {
       notes.value += `\n\n[Audit] Action finalized at ${stamp}.`;
     }
 
-    if (chip.classList.contains("approve")) {
+    if (pendingDecisionType === "approve") {
       finalizeBtn.textContent = "submitted";
-    } else if (chip.classList.contains("decline")) {
+      current.finalDecision = "submitted";
+    } else if (pendingDecisionType === "decline") {
       finalizeBtn.textContent = "declined";
-    } else {
+      current.finalDecision = "declined";
+    } else if (pendingDecisionType === "escalate") {
       finalizeBtn.textContent = "escalated";
+      current.finalDecision = "escalated";
     }
 
+    current.locked = true;
     finalizeBtn.disabled = true;
+
+    updateDecisionStatus();
+    updateActionButtons();
+
+    setTimeout(() => {
+      closeDecision();
+    }, 600);
   });
 
   $("approveBtn").addEventListener("click", () => {
+    if (current.locked) return;
     notes.value = "";
     conditions.value = "";
     openDecision("approve");
   });
 
   $("declineBtn").addEventListener("click", () => {
+    if (current.locked) return;
     notes.value = "";
     conditions.value = "";
     openDecision("decline");
   });
 
   $("escalateBtn").addEventListener("click", () => {
+    if (current.locked) return;
     notes.value = "";
     conditions.value = "";
     openDecision("escalate");
@@ -853,7 +956,8 @@
     notes.value = "";
     conditions.value = "";
     closeDecision();
-    applyProfile(profiles[e.target.value]);
+    currentKey = e.target.value;
+    applyProfile(profiles[currentKey]);
   });
 
   applyProfile(profiles.john);
