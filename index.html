@@ -32,7 +32,6 @@
     overflow-x:hidden;
   }
 
-  /* Make the layout feel "app-like" on mobile */
   .page{
     max-width: 720px;
     margin: 0 auto;
@@ -66,6 +65,43 @@
     flex:0 0 auto;
   }
 
+  /* NEW: PERSON SELECT BAR */
+  .pickbar{
+    background:var(--panel);
+    border-bottom:1px solid var(--border);
+    padding:10px 12px;
+    display:flex;
+    align-items:center;
+    justify-content:space-between;
+    gap:10px;
+  }
+  .pick-lbl{
+    font-size:10px;
+    color:var(--muted2);
+    letter-spacing:2px;
+    white-space:nowrap;
+  }
+  .pick{
+    flex:1 1 auto;
+    display:flex;
+    justify-content:flex-end;
+    gap:8px;
+    align-items:center;
+  }
+  .pick select{
+    width:100%;
+    max-width:320px;
+    background:#0b1020;
+    border:1px solid var(--border);
+    color:var(--textStrong);
+    border-radius:10px;
+    padding:10px 10px;
+    font-family:'Courier New', monospace;
+    font-size:11px;
+    letter-spacing:0.5px;
+    outline:none;
+  }
+
   /* APP HEADER */
   .app-hdr{
     background:var(--panel);
@@ -84,13 +120,11 @@
     margin-top:6px;
     letter-spacing:1px;
     line-height:1.6;
-    /* critical for mobile: allow wrap instead of forcing a single line */
     white-space:normal;
     overflow-wrap:anywhere;
     word-break:break-word;
   }
 
-  /* ACTIONS: make them wrap cleanly on small screens */
   .actions{
     display:flex;
     gap:8px;
@@ -98,7 +132,7 @@
     flex-wrap:wrap;
   }
   .btn{
-    flex:1 1 140px;         /* wrap into 2/3 rows on narrow phones */
+    flex:1 1 140px;
     min-width:120px;
     padding:10px 6px;
     font-size:11px;
@@ -118,7 +152,6 @@
   .btn-e{ background:rgba(245,158,11,.1); border-color:rgba(245,158,11,.4); color:var(--amber); }
   .btn-d{ background:rgba(239,68,68,.1); border-color:rgba(239,68,68,.4); color:var(--red); }
 
-  /* SECTION HEADERS */
   .section-hdr{
     background:var(--panel);
     border-bottom:1px solid var(--border);
@@ -128,7 +161,6 @@
     letter-spacing:2px;
   }
 
-  /* CARDS */
   .card{
     background:var(--panel);
     border:1px solid var(--border);
@@ -143,7 +175,6 @@
     margin-bottom:12px;
   }
 
-  /* SCORE RING */
   .score-center{ display:flex; flex-direction:column; align-items:center; gap:12px; }
   .ring-wrap{ position:relative; width:140px; height:140px; }
   .ring-wrap svg{ transform:rotate(-90deg); width:100%; height:100%; display:block; }
@@ -172,7 +203,6 @@
     line-height:1.8;
   }
 
-  /* REC */
   .rec{
     font-size:11px;
     color:#cbd5e1;
@@ -182,7 +212,6 @@
     overflow-wrap:anywhere;
   }
 
-  /* FACTOR ROWS */
   .frow{
     display:flex;
     justify-content:space-between;
@@ -198,14 +227,13 @@
     font-size:11px;
     color:#94a3b8;
     text-align:right;
-    white-space:nowrap;      /* keep numbers neat */
+    white-space:nowrap;
   }
   .dot{ width:8px; height:8px; border-radius:50%; display:inline-block; flex:0 0 auto; }
   .dot-low{ background:var(--green); }
   .dot-mid{ background:var(--amber); }
   .dot-high{ background:var(--red); }
 
-  /* DETAIL ROWS */
   .drow{
     display:flex;
     justify-content:space-between;
@@ -223,11 +251,10 @@
     text-align:right;
     flex: 1 1 45%;
     min-width:0;
-    overflow-wrap:anywhere;   /* prevents overflow on long values */
+    overflow-wrap:anywhere;
     word-break:break-word;
   }
 
-  /* RISK FACTOR BLOCKS */
   .rf{ padding:13px; margin-bottom:10px; border:1px solid; border-radius:12px; }
   .rf-top{
     display:flex;
@@ -245,7 +272,6 @@
   .rf-mid{ background:rgba(245,158,11,.07); border-color:rgba(245,158,11,.2); }
   .rf-high{ background:rgba(239,68,68,.07); border-color:rgba(239,68,68,.2); }
 
-  /* WARNING */
   .warn{
     background:var(--panel);
     border:1px solid rgba(192,0,0,.3);
@@ -258,20 +284,20 @@
   }
   .warn-lbl{ color:var(--brand); font-weight:700; }
 
-  /* MOBILE TUNING */
   @media (max-width: 420px){
     .topbar{ padding:10px; }
-    .platform{ display:none; }        /* more room for logo on tiny screens */
+    .platform{ display:none; }
     .card{ margin:10px; padding:12px; }
     .section-hdr{ padding:9px 10px; }
     .app-hdr{ padding:12px 10px; }
     .ring-wrap{ width:124px; height:124px; }
     .ring-num{ font-size:32px; }
     .verdict{ font-size:12px; padding:6px 14px; }
-    .btn{ flex:1 1 100%; min-width:0; } /* buttons stack vertically */
+    .btn{ flex:1 1 100%; min-width:0; }
+    .pickbar{ padding:10px; }
+    .pick select{ max-width:none; }
   }
 
-  /* Respect reduced motion */
   @media (prefers-reduced-motion: reduce){
     .btn:active{ transform:none; }
   }
@@ -290,10 +316,22 @@
       <span class="platform">AI UNDERWRITING</span>
     </div>
 
+    <!-- NEW: PERSON PICKER BAR -->
+    <div class="pickbar">
+      <div class="pick-lbl">VIEW APPLICANT</div>
+      <div class="pick">
+        <select id="personSelect" aria-label="Choose applicant">
+          <option value="john">John Doe — LOW RISK</option>
+          <option value="maya">Maya Chen — MEDIUM RISK</option>
+          <option value="darius">Darius Patel — HIGH RISK</option>
+        </select>
+      </div>
+    </div>
+
     <!-- APP HEADER -->
     <div class="app-hdr">
-      <div class="app-name">John Doe</div>
-      <div class="app-id">APP-2026-0847 &nbsp;|&nbsp; AGE 34 &nbsp;|&nbsp; Software Engineer &nbsp;|&nbsp; Ontario</div>
+      <div class="app-name" id="appName">John Doe</div>
+      <div class="app-id" id="appId">APP-2026-0847 &nbsp;|&nbsp; AGE 34 &nbsp;|&nbsp; Software Engineer &nbsp;|&nbsp; Ontario</div>
       <div class="actions">
         <button class="btn btn-a" type="button">APPROVE</button>
         <button class="btn btn-e" type="button">ESCALATE</button>
@@ -307,25 +345,25 @@
     <div class="card">
       <div class="card-title">AI COMPOSITE RISK SCORE</div>
       <div class="score-center">
-        <div class="ring-wrap" aria-label="Risk score 82 out of 100">
+        <div class="ring-wrap" aria-label="Risk score out of 100">
           <svg width="140" height="140" viewBox="0 0 140 140" role="img">
             <circle cx="70" cy="70" r="54" fill="none" stroke="#1e293b" stroke-width="10"></circle>
-            <circle cx="70" cy="70" r="54" fill="none" stroke="#22c55e" stroke-width="10"
+            <circle id="ringProgress" cx="70" cy="70" r="54" fill="none" stroke="#22c55e" stroke-width="10"
               stroke-dasharray="339.3" stroke-dashoffset="61"></circle>
           </svg>
           <div class="ring-overlay">
-            <div class="ring-num">82</div>
+            <div class="ring-num" id="ringNum">82</div>
             <div class="ring-sub">/ 100</div>
           </div>
         </div>
-        <div class="verdict">LOW RISK</div>
-        <div class="model-note">Logistic regression &middot; 6 variables<br>Trained on 971 records &middot; p &lt; 0.05</div>
+        <div class="verdict" id="verdict">LOW RISK</div>
+        <div class="model-note" id="modelNote">Logistic regression &middot; 6 variables<br>Trained on 971 records &middot; p &lt; 0.05</div>
       </div>
     </div>
 
     <div class="card">
       <div class="card-title">AI RECOMMENDATION</div>
-      <div class="rec">
+      <div class="rec" id="recText">
         APPROVE &mdash; Strong income, clean payment history and mortgage amount above the $500K safety threshold.
         Ontario/condo exposure noted; recommend standard variable-rate stress test.
       </div>
@@ -333,12 +371,12 @@
 
     <div class="card">
       <div class="card-title">RISK FACTOR SUMMARY</div>
-      <div class="frow"><span class="flabel">Mortgage Amount</span><div class="fright"><span class="fval">$520,000</span><span class="dot dot-low"></span></div></div>
-      <div class="frow"><span class="flabel">Mortgage History</span><div class="fright"><span class="fval">1st mortgage</span><span class="dot dot-low"></span></div></div>
-      <div class="frow"><span class="flabel">LTV Ratio</span><div class="fright"><span class="fval">66.7%</span><span class="dot dot-low"></span></div></div>
-      <div class="frow"><span class="flabel">Province</span><div class="fright"><span class="fval">Ontario</span><span class="dot dot-mid"></span></div></div>
-      <div class="frow"><span class="flabel">Property Type</span><div class="fright"><span class="fval">Condominium</span><span class="dot dot-mid"></span></div></div>
-      <div class="frow"><span class="flabel">Payment History</span><div class="fright"><span class="fval">Clean</span><span class="dot dot-low"></span></div></div>
+      <div class="frow"><span class="flabel">Mortgage Amount</span><div class="fright"><span class="fval" id="sumMortgage">$520,000</span><span class="dot dot-low" id="dotMortgage"></span></div></div>
+      <div class="frow"><span class="flabel">Mortgage History</span><div class="fright"><span class="fval" id="sumHistory">1st mortgage</span><span class="dot dot-low" id="dotHistory"></span></div></div>
+      <div class="frow"><span class="flabel">LTV Ratio</span><div class="fright"><span class="fval" id="sumLtv">66.7%</span><span class="dot dot-low" id="dotLtv"></span></div></div>
+      <div class="frow"><span class="flabel">Province</span><div class="fright"><span class="fval" id="sumProv">Ontario</span><span class="dot dot-mid" id="dotProv"></span></div></div>
+      <div class="frow"><span class="flabel">Property Type</span><div class="fright"><span class="fval" id="sumProp">Condominium</span><span class="dot dot-mid" id="dotProp"></span></div></div>
+      <div class="frow"><span class="flabel">Payment History</span><div class="fright"><span class="fval" id="sumPay">Clean</span><span class="dot dot-low" id="dotPay"></span></div></div>
     </div>
 
     <!-- APP DETAILS -->
@@ -346,74 +384,74 @@
 
     <div class="card">
       <div class="card-title">BORROWER PROFILE</div>
-      <div class="drow"><span class="dlabel">Full Name</span><span class="dval">John Doe</span></div>
-      <div class="drow"><span class="dlabel">Age</span><span class="dval">34 years</span></div>
-      <div class="drow"><span class="dlabel">Employment</span><span class="dval">Software Engineer</span></div>
-      <div class="drow"><span class="dlabel">Annual Income</span><span class="dval">$142,000</span></div>
-      <div class="drow"><span class="dlabel">Province</span><span class="dval">Ontario</span></div>
+      <div class="drow"><span class="dlabel">Full Name</span><span class="dval" id="dName">John Doe</span></div>
+      <div class="drow"><span class="dlabel">Age</span><span class="dval" id="dAge">34 years</span></div>
+      <div class="drow"><span class="dlabel">Employment</span><span class="dval" id="dEmp">Software Engineer</span></div>
+      <div class="drow"><span class="dlabel">Annual Income</span><span class="dval" id="dInc">$142,000</span></div>
+      <div class="drow"><span class="dlabel">Province</span><span class="dval" id="dProv">Ontario</span></div>
     </div>
 
     <div class="card">
       <div class="card-title">MORTGAGE DETAILS</div>
-      <div class="drow"><span class="dlabel">Mortgage Amount</span><span class="dval">$520,000</span></div>
-      <div class="drow"><span class="dlabel">Property Value</span><span class="dval">$780,000</span></div>
-      <div class="drow"><span class="dlabel">LTV Ratio</span><span class="dval">66.7%</span></div>
-      <div class="drow"><span class="dlabel">Mortgage Type</span><span class="dval">Fixed</span></div>
-      <div class="drow"><span class="dlabel">Interest Rate</span><span class="dval">5.1%</span></div>
+      <div class="drow"><span class="dlabel">Mortgage Amount</span><span class="dval" id="dMort">$520,000</span></div>
+      <div class="drow"><span class="dlabel">Property Value</span><span class="dval" id="dVal">$780,000</span></div>
+      <div class="drow"><span class="dlabel">LTV Ratio</span><span class="dval" id="dLtv">66.7%</span></div>
+      <div class="drow"><span class="dlabel">Mortgage Type</span><span class="dval" id="dType">Fixed</span></div>
+      <div class="drow"><span class="dlabel">Interest Rate</span><span class="dval" id="dRate">5.1%</span></div>
     </div>
 
     <div class="card">
       <div class="card-title">PROPERTY DETAILS</div>
-      <div class="drow"><span class="dlabel">Property Type</span><span class="dval">Condominium</span></div>
-      <div class="drow"><span class="dlabel">Province</span><span class="dval">Ontario</span></div>
-      <div class="drow"><span class="dlabel">Mortgage #</span><span class="dval">1st mortgage</span></div>
+      <div class="drow"><span class="dlabel">Property Type</span><span class="dval" id="dProp">Condominium</span></div>
+      <div class="drow"><span class="dlabel">Province</span><span class="dval" id="dProv2">Ontario</span></div>
+      <div class="drow"><span class="dlabel">Mortgage #</span><span class="dval" id="dHist">1st mortgage</span></div>
     </div>
 
     <div class="card">
       <div class="card-title">PAYMENT HISTORY</div>
-      <div class="drow"><span class="dlabel">Days Past Due</span><span class="dval">None</span></div>
-      <div class="drow"><span class="dlabel">Late Payments (12M)</span><span class="dval">None</span></div>
-      <div class="drow"><span class="dlabel">OSFI Classification</span><span class="dval">Performing</span></div>
+      <div class="drow"><span class="dlabel">Days Past Due</span><span class="dval" id="dDpd">None</span></div>
+      <div class="drow"><span class="dlabel">Late Payments (12M)</span><span class="dval" id="dLate">None</span></div>
+      <div class="drow"><span class="dlabel">OSFI Classification</span><span class="dval" id="dOsfi">Performing</span></div>
     </div>
 
     <!-- RISK FACTORS -->
     <div class="section-hdr">RISK FACTORS</div>
 
     <div style="margin: 10px 12px 12px;">
-      <div class="rf rf-low">
-        <div class="rf-top"><span class="rf-name">Mortgage Amount</span><span class="rf-val" style="color:#22c55e">$520,000</span></div>
-        <div class="rf-note">Above $500K threshold &mdash; zero high risk in this bracket historically.</div>
-        <div class="rf-bar-bg"><div class="rf-bar" style="width:20%;background:#22c55e"></div></div>
+      <div class="rf rf-low" id="rfMortgage">
+        <div class="rf-top"><span class="rf-name">Mortgage Amount</span><span class="rf-val" id="rfMortgageVal" style="color:#22c55e">$520,000</span></div>
+        <div class="rf-note" id="rfMortgageNote">Above $500K threshold &mdash; zero high risk in this bracket historically.</div>
+        <div class="rf-bar-bg"><div class="rf-bar" id="rfMortgageBar" style="width:20%;background:#22c55e"></div></div>
       </div>
 
-      <div class="rf rf-low">
-        <div class="rf-top"><span class="rf-name">Mortgage History</span><span class="rf-val" style="color:#22c55e">1st mortgage</span></div>
-        <div class="rf-note">First-time borrowers are the safest cohort (10.7% HR rate).</div>
-        <div class="rf-bar-bg"><div class="rf-bar" style="width:20%;background:#22c55e"></div></div>
+      <div class="rf rf-low" id="rfHistory">
+        <div class="rf-top"><span class="rf-name">Mortgage History</span><span class="rf-val" id="rfHistoryVal" style="color:#22c55e">1st mortgage</span></div>
+        <div class="rf-note" id="rfHistoryNote">First-time borrowers are the safest cohort (10.7% HR rate).</div>
+        <div class="rf-bar-bg"><div class="rf-bar" id="rfHistoryBar" style="width:20%;background:#22c55e"></div></div>
       </div>
 
-      <div class="rf rf-low">
-        <div class="rf-top"><span class="rf-name">LTV Ratio</span><span class="rf-val" style="color:#22c55e">66.7%</span></div>
-        <div class="rf-note">Within 65-80% moderate band &mdash; 4.8% high risk rate.</div>
-        <div class="rf-bar-bg"><div class="rf-bar" style="width:20%;background:#22c55e"></div></div>
+      <div class="rf rf-low" id="rfLtv">
+        <div class="rf-top"><span class="rf-name">LTV Ratio</span><span class="rf-val" id="rfLtvVal" style="color:#22c55e">66.7%</span></div>
+        <div class="rf-note" id="rfLtvNote">Within 65-80% moderate band &mdash; 4.8% high risk rate.</div>
+        <div class="rf-bar-bg"><div class="rf-bar" id="rfLtvBar" style="width:20%;background:#22c55e"></div></div>
       </div>
 
-      <div class="rf rf-mid">
-        <div class="rf-top"><span class="rf-name">Province</span><span class="rf-val" style="color:#f59e0b">Ontario</span></div>
-        <div class="rf-note">Ontario elevated at 18.1% HR &mdash; monitor ongoing.</div>
-        <div class="rf-bar-bg"><div class="rf-bar" style="width:50%;background:#f59e0b"></div></div>
+      <div class="rf rf-mid" id="rfProv">
+        <div class="rf-top"><span class="rf-name">Province</span><span class="rf-val" id="rfProvVal" style="color:#f59e0b">Ontario</span></div>
+        <div class="rf-note" id="rfProvNote">Ontario elevated at 18.1% HR &mdash; monitor ongoing.</div>
+        <div class="rf-bar-bg"><div class="rf-bar" id="rfProvBar" style="width:50%;background:#f59e0b"></div></div>
       </div>
 
-      <div class="rf rf-mid">
-        <div class="rf-top"><span class="rf-name">Property Type</span><span class="rf-val" style="color:#f59e0b">Condominium</span></div>
-        <div class="rf-note">Condos carry 18.5% HR rate &mdash; Toronto/Vancouver value risk.</div>
-        <div class="rf-bar-bg"><div class="rf-bar" style="width:50%;background:#f59e0b"></div></div>
+      <div class="rf rf-mid" id="rfProp">
+        <div class="rf-top"><span class="rf-name">Property Type</span><span class="rf-val" id="rfPropVal" style="color:#f59e0b">Condominium</span></div>
+        <div class="rf-note" id="rfPropNote">Condos carry 18.5% HR rate &mdash; Toronto/Vancouver value risk.</div>
+        <div class="rf-bar-bg"><div class="rf-bar" id="rfPropBar" style="width:50%;background:#f59e0b"></div></div>
       </div>
 
-      <div class="rf rf-low" style="margin-bottom:0;">
-        <div class="rf-top"><span class="rf-name">Payment History</span><span class="rf-val" style="color:#22c55e">Clean</span></div>
-        <div class="rf-note">No days past due, no late payments.</div>
-        <div class="rf-bar-bg"><div class="rf-bar" style="width:20%;background:#22c55e"></div></div>
+      <div class="rf rf-low" id="rfPay" style="margin-bottom:0;">
+        <div class="rf-top"><span class="rf-name">Payment History</span><span class="rf-val" id="rfPayVal" style="color:#22c55e">Clean</span></div>
+        <div class="rf-note" id="rfPayNote">No days past due, no late payments.</div>
+        <div class="rf-bar-bg"><div class="rf-bar" id="rfPayBar" style="width:20%;background:#22c55e"></div></div>
       </div>
     </div>
 
@@ -424,5 +462,220 @@
     </div>
 
   </div>
+
+<script>
+  // --- Data for 3 applicants (low / medium / high risk) ---
+  const PEOPLE = {
+    john: {
+      name: "John Doe",
+      appIdLine: "APP-2026-0847 &nbsp;|&nbsp; AGE 34 &nbsp;|&nbsp; Software Engineer &nbsp;|&nbsp; Ontario",
+      profile: { name:"John Doe", age:"34 years", emp:"Software Engineer", inc:"$142,000", prov:"Ontario" },
+      mortgage: { amt:"$520,000", val:"$780,000", ltv:"66.7%", type:"Fixed", rate:"5.1%" },
+      property: { type:"Condominium", prov:"Ontario", hist:"1st mortgage" },
+      payment: { dpd:"None", late:"None", osfi:"Performing" },
+      score: { num:82, verdict:"LOW RISK", color:"var(--green)", ring:"#22c55e" },
+      rec: "APPROVE &mdash; Strong income, clean payment history and mortgage amount above the $500K safety threshold. Ontario/condo exposure noted; recommend standard variable-rate stress test.",
+      summary: {
+        mortgage: { val:"$520,000", dot:"low" },
+        history: { val:"1st mortgage", dot:"low" },
+        ltv:     { val:"66.7%", dot:"low" },
+        prov:    { val:"Ontario", dot:"mid" },
+        prop:    { val:"Condominium", dot:"mid" },
+        pay:     { val:"Clean", dot:"low" },
+      },
+      rf: {
+        mortgage: { level:"low", val:"$520,000", note:"Above $500K threshold &mdash; zero high risk in this bracket historically.", bar:20 },
+        history:  { level:"low", val:"1st mortgage", note:"First-time borrowers are the safest cohort (10.7% HR rate).", bar:20 },
+        ltv:      { level:"low", val:"66.7%", note:"Within 65-80% moderate band &mdash; 4.8% high risk rate.", bar:20 },
+        prov:     { level:"mid", val:"Ontario", note:"Ontario elevated at 18.1% HR &mdash; monitor ongoing.", bar:50 },
+        prop:     { level:"mid", val:"Condominium", note:"Condos carry 18.5% HR rate &mdash; Toronto/Vancouver value risk.", bar:50 },
+        pay:      { level:"low", val:"Clean", note:"No days past due, no late payments.", bar:20 },
+      }
+    },
+
+    // MEDIUM RISK
+    maya: {
+      name: "Maya Chen",
+      appIdLine: "APP-2026-1129 &nbsp;|&nbsp; AGE 41 &nbsp;|&nbsp; Sales Manager &nbsp;|&nbsp; British Columbia",
+      profile: { name:"Maya Chen", age:"41 years", emp:"Sales Manager", inc:"$98,000", prov:"British Columbia" },
+      mortgage: { amt:"$690,000", val:"$860,000", ltv:"80.2%", type:"Variable", rate:"6.4%" },
+      property: { type:"Condominium", prov:"British Columbia", hist:"2nd mortgage" },
+      payment: { dpd:"10 days", late:"2 late", osfi:"Performing" },
+      score: { num:56, verdict:"MEDIUM RISK", color:"var(--amber)", ring:"#f59e0b" },
+      rec: "ESCALATE &mdash; Borderline LTV above 80%, variable-rate exposure, and recent minor delinquencies. Recommend income verification refresh + stress test at higher qualifying rate.",
+      summary: {
+        mortgage: { val:"$690,000", dot:"mid" },
+        history: { val:"2nd mortgage", dot:"mid" },
+        ltv:     { val:"80.2%", dot:"mid" },
+        prov:    { val:"British Columbia", dot:"mid" },
+        prop:    { val:"Condominium", dot:"mid" },
+        pay:     { val:"Minor delinquencies", dot:"mid" },
+      },
+      rf: {
+        mortgage: { level:"mid", val:"$690,000", note:"Higher principal increases sensitivity to rate changes.", bar:55 },
+        history:  { level:"mid", val:"2nd mortgage", note:"Repeat borrowers show higher variance in outcomes.", bar:50 },
+        ltv:      { level:"mid", val:"80.2%", note:"Just above 80% threshold &mdash; reduced equity buffer.", bar:60 },
+        prov:     { level:"mid", val:"British Columbia", note:"Market volatility exposure noted; monitor collateral risk.", bar:55 },
+        prop:     { level:"mid", val:"Condominium", note:"Condo market can reprice quickly in downturns.", bar:55 },
+        pay:      { level:"mid", val:"10 DPD / 2 late (12M)", note:"Recent minor late payments raise probability of future delinquency.", bar:60 },
+      }
+    },
+
+    // HIGH RISK
+    darius: {
+      name: "Darius Patel",
+      appIdLine: "APP-2026-1393 &nbsp;|&nbsp; AGE 29 &nbsp;|&nbsp; Gig Worker &nbsp;|&nbsp; Alberta",
+      profile: { name:"Darius Patel", age:"29 years", emp:"Gig Worker (contract)", inc:"$54,000", prov:"Alberta" },
+      mortgage: { amt:"$610,000", val:"$650,000", ltv:"93.8%", type:"Variable", rate:"7.2%" },
+      property: { type:"Detached", prov:"Alberta", hist:"Refinance" },
+      payment: { dpd:"60+ days", late:"5 late", osfi:"Stage 2 Watch" },
+      score: { num:21, verdict:"HIGH RISK", color:"var(--red)", ring:"#ef4444" },
+      rec: "DECLINE &mdash; Very high LTV, unstable income profile, and significant recent delinquencies. Consider re-application after 12 months clean payments and improved down payment.",
+      summary: {
+        mortgage: { val:"$610,000", dot:"high" },
+        history: { val:"Refinance", dot:"high" },
+        ltv:     { val:"93.8%", dot:"high" },
+        prov:    { val:"Alberta", dot:"mid" },
+        prop:    { val:"Detached", dot:"mid" },
+        pay:     { val:"60+ DPD / 5 late", dot:"high" },
+      },
+      rf: {
+        mortgage: { level:"mid", val:"$610,000", note:"Large balance relative to income; high payment burden.", bar:70 },
+        history:  { level:"high", val:"Refinance", note:"Refinance requests correlate with distress in this cohort.", bar:85 },
+        ltv:      { level:"high", val:"93.8%", note:"Extreme leverage &mdash; minimal equity buffer against losses.", bar:95 },
+        prov:     { level:"mid", val:"Alberta", note:"Commodity-cycle sensitivity noted; employment volatility risk.", bar:55 },
+        prop:     { level:"mid", val:"Detached", note:"Collateral depends heavily on local market liquidity.", bar:55 },
+        pay:      { level:"high", val:"60+ DPD / 5 late (12M)", note:"Material delinquency signal &mdash; elevated probability of default.", bar:95 },
+      }
+    }
+  };
+
+  // --- Helpers ---
+  const circ = 339.3; // fixed dasharray in your SVG
+  function dashOffsetFromScore(score){
+    // score 0 => full offset (circ), score 100 => 0
+    return (1 - (score/100)) * circ;
+  }
+
+  function setDot(el, level){
+    el.classList.remove("dot-low","dot-mid","dot-high");
+    el.classList.add(level === "low" ? "dot-low" : level === "mid" ? "dot-mid" : "dot-high");
+  }
+
+  function setRFBlock(blockEl, level){
+    blockEl.classList.remove("rf-low","rf-mid","rf-high");
+    blockEl.classList.add(level === "low" ? "rf-low" : level === "mid" ? "rf-mid" : "rf-high");
+  }
+
+  function levelColor(level){
+    return level === "low" ? "#22c55e" : level === "mid" ? "#f59e0b" : "#ef4444";
+  }
+
+  // --- Apply selected person to UI (minimal DOM ids added) ---
+  function applyPerson(key){
+    const p = PEOPLE[key];
+
+    // Header
+    document.getElementById("appName").textContent = p.name;
+    document.getElementById("appId").innerHTML = p.appIdLine;
+
+    // Score
+    document.getElementById("ringNum").textContent = p.score.num;
+    document.getElementById("verdict").textContent = p.score.verdict;
+
+    const verdictEl = document.getElementById("verdict");
+    verdictEl.style.borderColor = p.score.color;
+    verdictEl.style.color = p.score.color;
+    verdictEl.style.background =
+      p.score.verdict === "LOW RISK" ? "rgba(34,197,94,.08)" :
+      p.score.verdict === "MEDIUM RISK" ? "rgba(245,158,11,.08)" :
+      "rgba(239,68,68,.08)";
+
+    const ringNumEl = document.getElementById("ringNum");
+    ringNumEl.style.color = p.score.color;
+
+    const ring = document.getElementById("ringProgress");
+    ring.setAttribute("stroke", p.score.ring);
+    ring.setAttribute("stroke-dashoffset", dashOffsetFromScore(p.score.num).toFixed(1));
+
+    // Recommendation
+    const rec = document.getElementById("recText");
+    rec.innerHTML = p.rec;
+    rec.style.borderLeftColor = p.score.color;
+
+    // Summary rows
+    document.getElementById("sumMortgage").textContent = p.summary.mortgage.val;
+    setDot(document.getElementById("dotMortgage"), p.summary.mortgage.dot);
+
+    document.getElementById("sumHistory").textContent = p.summary.history.val;
+    setDot(document.getElementById("dotHistory"), p.summary.history.dot);
+
+    document.getElementById("sumLtv").textContent = p.summary.ltv.val;
+    setDot(document.getElementById("dotLtv"), p.summary.ltv.dot);
+
+    document.getElementById("sumProv").textContent = p.summary.prov.val;
+    setDot(document.getElementById("dotProv"), p.summary.prov.dot);
+
+    document.getElementById("sumProp").textContent = p.summary.prop.val;
+    setDot(document.getElementById("dotProp"), p.summary.prop.dot);
+
+    document.getElementById("sumPay").textContent = p.summary.pay.val;
+    setDot(document.getElementById("dotPay"), p.summary.pay.dot);
+
+    // Details
+    document.getElementById("dName").textContent = p.profile.name;
+    document.getElementById("dAge").textContent = p.profile.age;
+    document.getElementById("dEmp").textContent = p.profile.emp;
+    document.getElementById("dInc").textContent = p.profile.inc;
+    document.getElementById("dProv").textContent = p.profile.prov;
+
+    document.getElementById("dMort").textContent = p.mortgage.amt;
+    document.getElementById("dVal").textContent = p.mortgage.val;
+    document.getElementById("dLtv").textContent = p.mortgage.ltv;
+    document.getElementById("dType").textContent = p.mortgage.type;
+    document.getElementById("dRate").textContent = p.mortgage.rate;
+
+    document.getElementById("dProp").textContent = p.property.type;
+    document.getElementById("dProv2").textContent = p.property.prov;
+    document.getElementById("dHist").textContent = p.property.hist;
+
+    document.getElementById("dDpd").textContent = p.payment.dpd;
+    document.getElementById("dLate").textContent = p.payment.late;
+    document.getElementById("dOsfi").textContent = p.payment.osfi;
+
+    // Risk factor blocks
+    const rfMap = [
+      ["Mortgage", "mortgage"],
+      ["History", "history"],
+      ["Ltv", "ltv"],
+      ["Prov", "prov"],
+      ["Prop", "prop"],
+      ["Pay", "pay"]
+    ];
+
+    rfMap.forEach(([suffix, k]) => {
+      const cfg = p.rf[k];
+      const block = document.getElementById("rf" + suffix);
+      const valEl = document.getElementById("rf" + suffix + "Val");
+      const noteEl = document.getElementById("rf" + suffix + "Note");
+      const barEl = document.getElementById("rf" + suffix + "Bar");
+
+      setRFBlock(block, cfg.level);
+      valEl.textContent = cfg.val;
+      valEl.style.color = levelColor(cfg.level);
+      noteEl.innerHTML = cfg.note;
+      barEl.style.width = cfg.bar + "%";
+      barEl.style.background = levelColor(cfg.level);
+    });
+  }
+
+  // Wire select
+  const sel = document.getElementById("personSelect");
+  sel.addEventListener("change", (e) => applyPerson(e.target.value));
+
+  // Default
+  applyPerson(sel.value);
+</script>
+
 </body>
 </html>
