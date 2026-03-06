@@ -32,13 +32,12 @@
     overflow-x:hidden;
   }
 
-  .page{
-    max-width: 720px;
-    margin: 0 auto;
-  }
+  .page{ max-width:720px; margin:0 auto; }
 
-  /* TOP BAR */
   .topbar{
+    position:sticky;
+    top:0;
+    z-index:50;
     background:var(--panel);
     border-bottom:1px solid var(--border);
     padding:10px 12px;
@@ -65,44 +64,6 @@
     flex:0 0 auto;
   }
 
-  /* NEW: PERSON SELECT BAR */
-  .pickbar{
-    background:var(--panel);
-    border-bottom:1px solid var(--border);
-    padding:10px 12px;
-    display:flex;
-    align-items:center;
-    justify-content:space-between;
-    gap:10px;
-  }
-  .pick-lbl{
-    font-size:10px;
-    color:var(--muted2);
-    letter-spacing:2px;
-    white-space:nowrap;
-  }
-  .pick{
-    flex:1 1 auto;
-    display:flex;
-    justify-content:flex-end;
-    gap:8px;
-    align-items:center;
-  }
-  .pick select{
-    width:100%;
-    max-width:320px;
-    background:#0b1020;
-    border:1px solid var(--border);
-    color:var(--textStrong);
-    border-radius:10px;
-    padding:10px 10px;
-    font-family:'Courier New', monospace;
-    font-size:11px;
-    letter-spacing:0.5px;
-    outline:none;
-  }
-
-  /* APP HEADER */
   .app-hdr{
     background:var(--panel);
     border-bottom:1px solid var(--border);
@@ -125,6 +86,33 @@
     word-break:break-word;
   }
 
+  .switcher{
+    margin-top:10px;
+    display:flex;
+    gap:8px;
+    align-items:center;
+    flex-wrap:wrap;
+  }
+  .switcher label{
+    font-size:10px;
+    letter-spacing:2px;
+    color:var(--muted2);
+  }
+  .select{
+    flex:1 1 200px;
+    min-width:180px;
+    appearance:none;
+    -webkit-appearance:none;
+    background:rgba(255,255,255,.04);
+    border:1px solid var(--border);
+    color:var(--text);
+    padding:10px 10px;
+    border-radius:10px;
+    font-family:'Courier New', monospace;
+    font-size:12px;
+    outline:none;
+  }
+
   .actions{
     display:flex;
     gap:8px;
@@ -142,7 +130,7 @@
     font-family:'Courier New', monospace;
     border:1px solid;
     cursor:pointer;
-    border-radius:8px;
+    border-radius:10px;
     background:transparent;
     -webkit-tap-highlight-color:transparent;
     touch-action:manipulation;
@@ -151,6 +139,7 @@
   .btn-a{ background:rgba(34,197,94,.1); border-color:rgba(34,197,94,.4); color:var(--green); }
   .btn-e{ background:rgba(245,158,11,.1); border-color:rgba(245,158,11,.4); color:var(--amber); }
   .btn-d{ background:rgba(239,68,68,.1); border-color:rgba(239,68,68,.4); color:var(--red); }
+  .btn-s{ background:rgba(148,163,184,.06); border-color:rgba(148,163,184,.25); color:#cbd5e1; }
 
   .section-hdr{
     background:var(--panel);
@@ -223,12 +212,7 @@
   .frow:last-child{ border-bottom:none; }
   .flabel{ font-size:11px; color:var(--muted); min-width:0; }
   .fright{ display:flex; align-items:center; gap:8px; min-width:0; }
-  .fval{
-    font-size:11px;
-    color:#94a3b8;
-    text-align:right;
-    white-space:nowrap;
-  }
+  .fval{ font-size:11px; color:#94a3b8; text-align:right; white-space:nowrap; }
   .dot{ width:8px; height:8px; border-radius:50%; display:inline-block; flex:0 0 auto; }
   .dot-low{ background:var(--green); }
   .dot-mid{ background:var(--amber); }
@@ -243,26 +227,20 @@
     border-bottom:1px solid #111827;
   }
   .drow:last-child{ border-bottom:none; }
-  .dlabel{ font-size:11px; color:var(--muted2); flex: 1 1 55%; min-width:0; }
+  .dlabel{ font-size:11px; color:var(--muted2); flex:1 1 55%; min-width:0; }
   .dval{
     font-size:11px;
     color:var(--text);
     font-weight:500;
     text-align:right;
-    flex: 1 1 45%;
+    flex:1 1 45%;
     min-width:0;
     overflow-wrap:anywhere;
     word-break:break-word;
   }
 
   .rf{ padding:13px; margin-bottom:10px; border:1px solid; border-radius:12px; }
-  .rf-top{
-    display:flex;
-    justify-content:space-between;
-    align-items:baseline;
-    gap:12px;
-    margin-bottom:6px;
-  }
+  .rf-top{ display:flex; justify-content:space-between; align-items:baseline; gap:12px; margin-bottom:6px; }
   .rf-name{ font-size:12px; font-weight:600; color:var(--text); min-width:0; }
   .rf-val{ font-size:12px; font-weight:700; text-align:right; white-space:nowrap; }
   .rf-note{ font-size:11px; color:#94a3b8; line-height:1.6; margin-bottom:10px; overflow-wrap:anywhere; }
@@ -284,7 +262,93 @@
   }
   .warn-lbl{ color:var(--brand); font-weight:700; }
 
-  @media (max-width: 420px){
+  .modal{
+    position:fixed;
+    inset:0;
+    background:rgba(0,0,0,.55);
+    display:none;
+    align-items:flex-end;
+    justify-content:center;
+    padding:16px;
+    z-index:100;
+  }
+  .modal.show{ display:flex; }
+  .sheet{
+    width:min(680px, 100%);
+    background:var(--panel);
+    border:1px solid var(--border);
+    border-radius:16px;
+    padding:14px;
+    box-shadow:0 20px 50px rgba(0,0,0,.35);
+  }
+  .sheet-hdr{
+    display:flex;
+    align-items:flex-start;
+    justify-content:space-between;
+    gap:12px;
+    border-bottom:1px solid #111827;
+    padding-bottom:10px;
+    margin-bottom:10px;
+  }
+  .sheet-title{
+    font-weight:700;
+    letter-spacing:2px;
+    font-size:12px;
+  }
+  .chip{
+    display:inline-flex;
+    align-items:center;
+    gap:8px;
+    padding:6px 10px;
+    border-radius:999px;
+    font-size:11px;
+    font-weight:700;
+    letter-spacing:1px;
+    border:1px solid;
+    white-space:nowrap;
+  }
+  .chip.approve{ color:var(--green); border-color:rgba(34,197,94,.35); background:rgba(34,197,94,.08); }
+  .chip.decline{ color:var(--red); border-color:rgba(239,68,68,.35); background:rgba(239,68,68,.08); }
+  .chip.escalate{ color:var(--amber); border-color:rgba(245,158,11,.35); background:rgba(245,158,11,.08); }
+  .xbtn{
+    background:transparent;
+    border:1px solid rgba(148,163,184,.25);
+    color:#cbd5e1;
+    border-radius:10px;
+    padding:8px 10px;
+    cursor:pointer;
+    font-family:'Courier New', monospace;
+    font-size:12px;
+  }
+  .xbtn:active{ transform:translateY(1px); }
+
+  .sheet-body{ display:grid; gap:10px; }
+  .field{ display:grid; gap:6px; }
+  .field label{
+    font-size:10px;
+    letter-spacing:2px;
+    color:var(--muted2);
+  }
+  .input, .textarea{
+    width:100%;
+    background:rgba(255,255,255,.04);
+    border:1px solid var(--border);
+    border-radius:12px;
+    color:var(--text);
+    padding:10px 10px;
+    font-family:'Courier New', monospace;
+    font-size:12px;
+    outline:none;
+  }
+  .textarea{ min-height:90px; resize:vertical; }
+  .sheet-actions{
+    display:flex;
+    gap:8px;
+    flex-wrap:wrap;
+    margin-top:6px;
+  }
+
+  @media (max-width:420px){
     .topbar{ padding:10px; }
     .platform{ display:none; }
     .card{ margin:10px; padding:12px; }
@@ -294,19 +358,17 @@
     .ring-num{ font-size:32px; }
     .verdict{ font-size:12px; padding:6px 14px; }
     .btn{ flex:1 1 100%; min-width:0; }
-    .pickbar{ padding:10px; }
-    .pick select{ max-width:none; }
+    .select{ flex:1 1 100%; min-width:0; }
+    .modal{ align-items:flex-end; }
   }
 
   @media (prefers-reduced-motion: reduce){
-    .btn:active{ transform:none; }
+    .btn:active, .xbtn:active{ transform:none; }
   }
 </style>
 </head>
 <body>
   <div class="page">
-
-    <!-- TOP BAR -->
     <div class="topbar">
       <div class="logo">
         <span class="red">RED</span>
@@ -316,47 +378,46 @@
       <span class="platform">AI UNDERWRITING</span>
     </div>
 
-    <!-- NEW: PERSON PICKER BAR -->
-    <div class="pickbar">
-      <div class="pick-lbl">VIEW APPLICANT</div>
-      <div class="pick">
-        <select id="personSelect" aria-label="Choose applicant">
-          <option value="john">John Doe — LOW RISK</option>
-          <option value="maya">Maya Chen — MEDIUM RISK</option>
-          <option value="darius">Darius Patel — HIGH RISK</option>
-        </select>
-      </div>
-    </div>
-
-    <!-- APP HEADER -->
     <div class="app-hdr">
       <div class="app-name" id="appName">John Doe</div>
-      <div class="app-id" id="appId">APP-2026-0847 &nbsp;|&nbsp; AGE 34 &nbsp;|&nbsp; Software Engineer &nbsp;|&nbsp; Ontario</div>
+
+      <div class="app-id" id="appMeta">
+        APP-2026-0847 &nbsp;|&nbsp; AGE 34 &nbsp;|&nbsp; Software Engineer &nbsp;|&nbsp; Ontario
+      </div>
+
+      <div class="switcher">
+        <label for="profileSel">PROFILE</label>
+        <select class="select" id="profileSel">
+          <option value="john">John Doe</option>
+          <option value="mary">Mary Jane</option>
+          <option value="james">James Bond</option>
+        </select>
+      </div>
+
       <div class="actions">
-        <button class="btn btn-a" type="button">APPROVE</button>
-        <button class="btn btn-e" type="button">ESCALATE</button>
-        <button class="btn btn-d" type="button">DECLINE</button>
+        <button class="btn btn-a" type="button" id="approveBtn">APPROVE</button>
+        <button class="btn btn-e" type="button" id="escalateBtn">ESCALATE</button>
+        <button class="btn btn-d" type="button" id="declineBtn">DECLINE</button>
       </div>
     </div>
 
-    <!-- AI RISK SCORE -->
     <div class="section-hdr">AI RISK SCORE</div>
 
     <div class="card">
       <div class="card-title">AI COMPOSITE RISK SCORE</div>
       <div class="score-center">
-        <div class="ring-wrap" aria-label="Risk score out of 100">
-          <svg width="140" height="140" viewBox="0 0 140 140" role="img">
+        <div class="ring-wrap" aria-label="Risk score">
+          <svg width="140" height="140" viewBox="0 0 140 140" role="img" aria-hidden="true">
             <circle cx="70" cy="70" r="54" fill="none" stroke="#1e293b" stroke-width="10"></circle>
-            <circle id="ringProgress" cx="70" cy="70" r="54" fill="none" stroke="#22c55e" stroke-width="10"
+            <circle id="scoreArc" cx="70" cy="70" r="54" fill="none" stroke="#22c55e" stroke-width="10"
               stroke-dasharray="339.3" stroke-dashoffset="61"></circle>
           </svg>
           <div class="ring-overlay">
-            <div class="ring-num" id="ringNum">82</div>
+            <div class="ring-num" id="scoreNum">82</div>
             <div class="ring-sub">/ 100</div>
           </div>
         </div>
-        <div class="verdict" id="verdict">LOW RISK</div>
+        <div class="verdict" id="scoreVerdict">LOW RISK</div>
         <div class="model-note" id="modelNote">Logistic regression &middot; 6 variables<br>Trained on 971 records &middot; p &lt; 0.05</div>
       </div>
     </div>
@@ -371,29 +432,28 @@
 
     <div class="card">
       <div class="card-title">RISK FACTOR SUMMARY</div>
-      <div class="frow"><span class="flabel">Mortgage Amount</span><div class="fright"><span class="fval" id="sumMortgage">$520,000</span><span class="dot dot-low" id="dotMortgage"></span></div></div>
-      <div class="frow"><span class="flabel">Mortgage History</span><div class="fright"><span class="fval" id="sumHistory">1st mortgage</span><span class="dot dot-low" id="dotHistory"></span></div></div>
+      <div class="frow"><span class="flabel">Mortgage Amount</span><div class="fright"><span class="fval" id="sumAmt">$520,000</span><span class="dot dot-low" id="dotAmt"></span></div></div>
+      <div class="frow"><span class="flabel">Mortgage History</span><div class="fright"><span class="fval" id="sumHist">1st mortgage</span><span class="dot dot-low" id="dotHist"></span></div></div>
       <div class="frow"><span class="flabel">LTV Ratio</span><div class="fright"><span class="fval" id="sumLtv">66.7%</span><span class="dot dot-low" id="dotLtv"></span></div></div>
       <div class="frow"><span class="flabel">Province</span><div class="fright"><span class="fval" id="sumProv">Ontario</span><span class="dot dot-mid" id="dotProv"></span></div></div>
       <div class="frow"><span class="flabel">Property Type</span><div class="fright"><span class="fval" id="sumProp">Condominium</span><span class="dot dot-mid" id="dotProp"></span></div></div>
       <div class="frow"><span class="flabel">Payment History</span><div class="fright"><span class="fval" id="sumPay">Clean</span><span class="dot dot-low" id="dotPay"></span></div></div>
     </div>
 
-    <!-- APP DETAILS -->
     <div class="section-hdr">APPLICATION DETAILS</div>
 
     <div class="card">
       <div class="card-title">BORROWER PROFILE</div>
       <div class="drow"><span class="dlabel">Full Name</span><span class="dval" id="dName">John Doe</span></div>
       <div class="drow"><span class="dlabel">Age</span><span class="dval" id="dAge">34 years</span></div>
-      <div class="drow"><span class="dlabel">Employment</span><span class="dval" id="dEmp">Software Engineer</span></div>
+      <div class="drow"><span class="dlabel">Employment</span><span class="dval" id="dJob">Software Engineer</span></div>
       <div class="drow"><span class="dlabel">Annual Income</span><span class="dval" id="dInc">$142,000</span></div>
       <div class="drow"><span class="dlabel">Province</span><span class="dval" id="dProv">Ontario</span></div>
     </div>
 
     <div class="card">
       <div class="card-title">MORTGAGE DETAILS</div>
-      <div class="drow"><span class="dlabel">Mortgage Amount</span><span class="dval" id="dMort">$520,000</span></div>
+      <div class="drow"><span class="dlabel">Mortgage Amount</span><span class="dval" id="dAmt">$520,000</span></div>
       <div class="drow"><span class="dlabel">Property Value</span><span class="dval" id="dVal">$780,000</span></div>
       <div class="drow"><span class="dlabel">LTV Ratio</span><span class="dval" id="dLtv">66.7%</span></div>
       <div class="drow"><span class="dlabel">Mortgage Type</span><span class="dval" id="dType">Fixed</span></div>
@@ -414,42 +474,41 @@
       <div class="drow"><span class="dlabel">OSFI Classification</span><span class="dval" id="dOsfi">Performing</span></div>
     </div>
 
-    <!-- RISK FACTORS -->
     <div class="section-hdr">RISK FACTORS</div>
 
     <div style="margin: 10px 12px 12px;">
-      <div class="rf rf-low" id="rfMortgage">
-        <div class="rf-top"><span class="rf-name">Mortgage Amount</span><span class="rf-val" id="rfMortgageVal" style="color:#22c55e">$520,000</span></div>
-        <div class="rf-note" id="rfMortgageNote">Above $500K threshold &mdash; zero high risk in this bracket historically.</div>
-        <div class="rf-bar-bg"><div class="rf-bar" id="rfMortgageBar" style="width:20%;background:#22c55e"></div></div>
+      <div class="rf rf-low">
+        <div class="rf-top"><span class="rf-name">Mortgage Amount</span><span class="rf-val" id="rfAmt" style="color:#22c55e">$520,000</span></div>
+        <div class="rf-note" id="rfAmtNote">Above $500K threshold &mdash; zero high risk in this bracket historically.</div>
+        <div class="rf-bar-bg"><div class="rf-bar" id="rfAmtBar" style="width:20%;background:#22c55e"></div></div>
       </div>
 
-      <div class="rf rf-low" id="rfHistory">
-        <div class="rf-top"><span class="rf-name">Mortgage History</span><span class="rf-val" id="rfHistoryVal" style="color:#22c55e">1st mortgage</span></div>
-        <div class="rf-note" id="rfHistoryNote">First-time borrowers are the safest cohort (10.7% HR rate).</div>
-        <div class="rf-bar-bg"><div class="rf-bar" id="rfHistoryBar" style="width:20%;background:#22c55e"></div></div>
+      <div class="rf rf-low">
+        <div class="rf-top"><span class="rf-name">Mortgage History</span><span class="rf-val" id="rfHist" style="color:#22c55e">1st mortgage</span></div>
+        <div class="rf-note" id="rfHistNote">First-time borrowers are the safest cohort (10.7% HR rate).</div>
+        <div class="rf-bar-bg"><div class="rf-bar" id="rfHistBar" style="width:20%;background:#22c55e"></div></div>
       </div>
 
-      <div class="rf rf-low" id="rfLtv">
-        <div class="rf-top"><span class="rf-name">LTV Ratio</span><span class="rf-val" id="rfLtvVal" style="color:#22c55e">66.7%</span></div>
+      <div class="rf rf-low">
+        <div class="rf-top"><span class="rf-name">LTV Ratio</span><span class="rf-val" id="rfLtv" style="color:#22c55e">66.7%</span></div>
         <div class="rf-note" id="rfLtvNote">Within 65-80% moderate band &mdash; 4.8% high risk rate.</div>
         <div class="rf-bar-bg"><div class="rf-bar" id="rfLtvBar" style="width:20%;background:#22c55e"></div></div>
       </div>
 
-      <div class="rf rf-mid" id="rfProv">
-        <div class="rf-top"><span class="rf-name">Province</span><span class="rf-val" id="rfProvVal" style="color:#f59e0b">Ontario</span></div>
+      <div class="rf rf-mid">
+        <div class="rf-top"><span class="rf-name">Province</span><span class="rf-val" id="rfProv" style="color:#f59e0b">Ontario</span></div>
         <div class="rf-note" id="rfProvNote">Ontario elevated at 18.1% HR &mdash; monitor ongoing.</div>
         <div class="rf-bar-bg"><div class="rf-bar" id="rfProvBar" style="width:50%;background:#f59e0b"></div></div>
       </div>
 
-      <div class="rf rf-mid" id="rfProp">
-        <div class="rf-top"><span class="rf-name">Property Type</span><span class="rf-val" id="rfPropVal" style="color:#f59e0b">Condominium</span></div>
+      <div class="rf rf-mid">
+        <div class="rf-top"><span class="rf-name">Property Type</span><span class="rf-val" id="rfProp" style="color:#f59e0b">Condominium</span></div>
         <div class="rf-note" id="rfPropNote">Condos carry 18.5% HR rate &mdash; Toronto/Vancouver value risk.</div>
         <div class="rf-bar-bg"><div class="rf-bar" id="rfPropBar" style="width:50%;background:#f59e0b"></div></div>
       </div>
 
-      <div class="rf rf-low" id="rfPay" style="margin-bottom:0;">
-        <div class="rf-top"><span class="rf-name">Payment History</span><span class="rf-val" id="rfPayVal" style="color:#22c55e">Clean</span></div>
+      <div class="rf rf-low" style="margin-bottom:0;">
+        <div class="rf-top"><span class="rf-name">Payment History</span><span class="rf-val" id="rfPay" style="color:#22c55e">Clean</span></div>
         <div class="rf-note" id="rfPayNote">No days past due, no late payments.</div>
         <div class="rf-bar-bg"><div class="rf-bar" id="rfPayBar" style="width:20%;background:#22c55e"></div></div>
       </div>
@@ -460,222 +519,346 @@
       AI scoring is advisory only. All credit decisions must be reviewed and approved by a licensed underwriter.
       Compliant with OSFI B-20 mortgage underwriting guidelines.
     </div>
+  </div>
 
+  <div class="modal" id="decisionModal" role="dialog" aria-modal="true" aria-labelledby="decisionTitle">
+    <div class="sheet">
+      <div class="sheet-hdr">
+        <div>
+          <div class="sheet-title" id="decisionTitle">DECISION</div>
+          <div style="margin-top:6px;">
+            <span class="chip approve" id="decisionChip">APPROVED</span>
+          </div>
+        </div>
+        <button class="xbtn" type="button" id="closeModalBtn">CLOSE</button>
+      </div>
+
+      <div class="sheet-body">
+        <div class="field">
+          <label>APPLICATION</label>
+          <div class="input" id="decisionAppLine" style="display:flex;justify-content:space-between;gap:10px;">
+            <span id="decisionAppId">APP-2026-0847</span>
+            <span id="decisionName" style="color:#cbd5e1;">John Doe</span>
+          </div>
+        </div>
+
+        <div class="field">
+          <label>UNDERWRITER NOTES</label>
+          <textarea class="textarea" id="decisionNotes" placeholder="Add rationale, conditions, escalation reason, etc."></textarea>
+        </div>
+
+        <div class="field" id="conditionsField">
+          <label>CONDITIONS / NEXT STEPS</label>
+          <textarea class="textarea" id="decisionConditions" placeholder="e.g., verify income, request appraisal, apply stress test..."></textarea>
+        </div>
+
+        <div class="sheet-actions">
+          <button class="btn btn-s" type="button" id="backBtn">BACK</button>
+          <button class="btn btn-a" type="button" id="finalizeBtn">FINALIZE</button>
+        </div>
+
+        <div style="font-size:10px;color:var(--muted2);line-height:1.6;">
+          This screen simulates the post-decision workflow. In a real system, finalizing would create an audit event,
+          lock the decision, and route tasks for funding, compliance, or escalation.
+        </div>
+      </div>
+    </div>
   </div>
 
 <script>
-  // --- Data for 3 applicants (low / medium / high risk) ---
-  const PEOPLE = {
+  const profiles = {
     john: {
       name: "John Doe",
-      appIdLine: "APP-2026-0847 &nbsp;|&nbsp; AGE 34 &nbsp;|&nbsp; Software Engineer &nbsp;|&nbsp; Ontario",
-      profile: { name:"John Doe", age:"34 years", emp:"Software Engineer", inc:"$142,000", prov:"Ontario" },
-      mortgage: { amt:"$520,000", val:"$780,000", ltv:"66.7%", type:"Fixed", rate:"5.1%" },
-      property: { type:"Condominium", prov:"Ontario", hist:"1st mortgage" },
-      payment: { dpd:"None", late:"None", osfi:"Performing" },
-      score: { num:82, verdict:"LOW RISK", color:"var(--green)", ring:"#22c55e" },
-      rec: "APPROVE &mdash; Strong income, clean payment history and mortgage amount above the $500K safety threshold. Ontario/condo exposure noted; recommend standard variable-rate stress test.",
-      summary: {
-        mortgage: { val:"$520,000", dot:"low" },
-        history: { val:"1st mortgage", dot:"low" },
-        ltv:     { val:"66.7%", dot:"low" },
-        prov:    { val:"Ontario", dot:"mid" },
-        prop:    { val:"Condominium", dot:"mid" },
-        pay:     { val:"Clean", dot:"low" },
-      },
-      rf: {
-        mortgage: { level:"low", val:"$520,000", note:"Above $500K threshold &mdash; zero high risk in this bracket historically.", bar:20 },
-        history:  { level:"low", val:"1st mortgage", note:"First-time borrowers are the safest cohort (10.7% HR rate).", bar:20 },
-        ltv:      { level:"low", val:"66.7%", note:"Within 65-80% moderate band &mdash; 4.8% high risk rate.", bar:20 },
-        prov:     { level:"mid", val:"Ontario", note:"Ontario elevated at 18.1% HR &mdash; monitor ongoing.", bar:50 },
-        prop:     { level:"mid", val:"Condominium", note:"Condos carry 18.5% HR rate &mdash; Toronto/Vancouver value risk.", bar:50 },
-        pay:      { level:"low", val:"Clean", note:"No days past due, no late payments.", bar:20 },
-      }
+      appId: "APP-2026-0847",
+      age: 34,
+      job: "Software Engineer",
+      province: "Ontario",
+      score: 82,
+      verdict: "LOW RISK",
+      scoreColor: "#22c55e",
+      rec: "APPROVE — Strong income, clean payment history and mortgage amount above the $500K safety threshold. Ontario/condo exposure noted; recommend standard variable-rate stress test.",
+      mortgageAmount: "$520,000",
+      propertyValue: "$780,000",
+      ltv: "66.7%",
+      mType: "Fixed",
+      rate: "5.1%",
+      propertyType: "Condominium",
+      mortgageHistory: "1st mortgage",
+      paymentHistory: "Clean",
+      dpd: "None",
+      late12: "None",
+      osfi: "Performing",
+      income: "$142,000"
     },
-
-    // MEDIUM RISK
-    maya: {
-      name: "Maya Chen",
-      appIdLine: "APP-2026-1129 &nbsp;|&nbsp; AGE 41 &nbsp;|&nbsp; Sales Manager &nbsp;|&nbsp; British Columbia",
-      profile: { name:"Maya Chen", age:"41 years", emp:"Sales Manager", inc:"$98,000", prov:"British Columbia" },
-      mortgage: { amt:"$690,000", val:"$860,000", ltv:"80.2%", type:"Variable", rate:"6.4%" },
-      property: { type:"Condominium", prov:"British Columbia", hist:"2nd mortgage" },
-      payment: { dpd:"10 days", late:"2 late", osfi:"Performing" },
-      score: { num:56, verdict:"MEDIUM RISK", color:"var(--amber)", ring:"#f59e0b" },
-      rec: "ESCALATE &mdash; Borderline LTV above 80%, variable-rate exposure, and recent minor delinquencies. Recommend income verification refresh + stress test at higher qualifying rate.",
-      summary: {
-        mortgage: { val:"$690,000", dot:"mid" },
-        history: { val:"2nd mortgage", dot:"mid" },
-        ltv:     { val:"80.2%", dot:"mid" },
-        prov:    { val:"British Columbia", dot:"mid" },
-        prop:    { val:"Condominium", dot:"mid" },
-        pay:     { val:"Minor delinquencies", dot:"mid" },
-      },
-      rf: {
-        mortgage: { level:"mid", val:"$690,000", note:"Higher principal increases sensitivity to rate changes.", bar:55 },
-        history:  { level:"mid", val:"2nd mortgage", note:"Repeat borrowers show higher variance in outcomes.", bar:50 },
-        ltv:      { level:"mid", val:"80.2%", note:"Just above 80% threshold &mdash; reduced equity buffer.", bar:60 },
-        prov:     { level:"mid", val:"British Columbia", note:"Market volatility exposure noted; monitor collateral risk.", bar:55 },
-        prop:     { level:"mid", val:"Condominium", note:"Condo market can reprice quickly in downturns.", bar:55 },
-        pay:      { level:"mid", val:"10 DPD / 2 late (12M)", note:"Recent minor late payments raise probability of future delinquency.", bar:60 },
-      }
+    mary: {
+      name: "Mary Jane",
+      appId: "APP-2026-1021",
+      age: 29,
+      job: "Registered Nurse",
+      province: "British Columbia",
+      score: 61,
+      verdict: "MEDIUM RISK",
+      scoreColor: "#f59e0b",
+      rec: "ESCALATE — Solid income but higher LTV and BC market exposure. Recommend additional verification, updated appraisal, and senior review before approval.",
+      mortgageAmount: "$640,000",
+      propertyValue: "$710,000",
+      ltv: "90.1%",
+      mType: "Variable",
+      rate: "5.6%",
+      propertyType: "Condominium",
+      mortgageHistory: "1st mortgage",
+      paymentHistory: "Minor delinquencies",
+      dpd: "1x 30-day (last 24M)",
+      late12: "1",
+      osfi: "Performing",
+      income: "$118,000"
     },
-
-    // HIGH RISK
-    darius: {
-      name: "Darius Patel",
-      appIdLine: "APP-2026-1393 &nbsp;|&nbsp; AGE 29 &nbsp;|&nbsp; Gig Worker &nbsp;|&nbsp; Alberta",
-      profile: { name:"Darius Patel", age:"29 years", emp:"Gig Worker (contract)", inc:"$54,000", prov:"Alberta" },
-      mortgage: { amt:"$610,000", val:"$650,000", ltv:"93.8%", type:"Variable", rate:"7.2%" },
-      property: { type:"Detached", prov:"Alberta", hist:"Refinance" },
-      payment: { dpd:"60+ days", late:"5 late", osfi:"Stage 2 Watch" },
-      score: { num:21, verdict:"HIGH RISK", color:"var(--red)", ring:"#ef4444" },
-      rec: "DECLINE &mdash; Very high LTV, unstable income profile, and significant recent delinquencies. Consider re-application after 12 months clean payments and improved down payment.",
-      summary: {
-        mortgage: { val:"$610,000", dot:"high" },
-        history: { val:"Refinance", dot:"high" },
-        ltv:     { val:"93.8%", dot:"high" },
-        prov:    { val:"Alberta", dot:"mid" },
-        prop:    { val:"Detached", dot:"mid" },
-        pay:     { val:"60+ DPD / 5 late", dot:"high" },
-      },
-      rf: {
-        mortgage: { level:"mid", val:"$610,000", note:"Large balance relative to income; high payment burden.", bar:70 },
-        history:  { level:"high", val:"Refinance", note:"Refinance requests correlate with distress in this cohort.", bar:85 },
-        ltv:      { level:"high", val:"93.8%", note:"Extreme leverage &mdash; minimal equity buffer against losses.", bar:95 },
-        prov:     { level:"mid", val:"Alberta", note:"Commodity-cycle sensitivity noted; employment volatility risk.", bar:55 },
-        prop:     { level:"mid", val:"Detached", note:"Collateral depends heavily on local market liquidity.", bar:55 },
-        pay:      { level:"high", val:"60+ DPD / 5 late (12M)", note:"Material delinquency signal &mdash; elevated probability of default.", bar:95 },
-      }
+    james: {
+      name: "James Bond",
+      appId: "APP-2026-0097",
+      age: 41,
+      job: "Consultant",
+      province: "Quebec",
+      score: 38,
+      verdict: "HIGH RISK",
+      scoreColor: "#ef4444",
+      rec: "DECLINE — Elevated risk profile with weaker payment history, higher LTV, and insufficient compensating factors. Recommend decline or deep manual review.",
+      mortgageAmount: "$850,000",
+      propertyValue: "$900,000",
+      ltv: "94.4%",
+      mType: "Variable",
+      rate: "6.2%",
+      propertyType: "Detached",
+      mortgageHistory: "2nd mortgage",
+      paymentHistory: "Delinquencies",
+      dpd: "2x 60-day (last 24M)",
+      late12: "2",
+      osfi: "Watchlist",
+      income: "$98,000"
     }
   };
 
-  // --- Helpers ---
-  const circ = 339.3; // fixed dasharray in your SVG
-  function dashOffsetFromScore(score){
-    // score 0 => full offset (circ), score 100 => 0
-    return (1 - (score/100)) * circ;
+  const $ = (id) => document.getElementById(id);
+  const CIRC = 339.3;
+  let current = profiles.john;
+
+  function clamp(n, min, max){
+    return Math.max(min, Math.min(max, n));
   }
 
-  function setDot(el, level){
-    el.classList.remove("dot-low","dot-mid","dot-high");
-    el.classList.add(level === "low" ? "dot-low" : level === "mid" ? "dot-mid" : "dot-high");
-  }
+  function setScore(score, color){
+    const s = clamp(Number(score) || 0, 0, 100);
+    const offset = CIRC * (1 - s / 100);
 
-  function setRFBlock(blockEl, level){
-    blockEl.classList.remove("rf-low","rf-mid","rf-high");
-    blockEl.classList.add(level === "low" ? "rf-low" : level === "mid" ? "rf-mid" : "rf-high");
-  }
+    $("scoreArc").setAttribute("stroke-dasharray", String(CIRC));
+    $("scoreArc").setAttribute("stroke-dashoffset", String(offset.toFixed(1)));
+    $("scoreArc").setAttribute("stroke", color);
 
-  function levelColor(level){
-    return level === "low" ? "#22c55e" : level === "mid" ? "#f59e0b" : "#ef4444";
-  }
+    $("scoreNum").textContent = String(s);
+    $("scoreNum").style.color = color;
 
-  // --- Apply selected person to UI (minimal DOM ids added) ---
-  function applyPerson(key){
-    const p = PEOPLE[key];
-
-    // Header
-    document.getElementById("appName").textContent = p.name;
-    document.getElementById("appId").innerHTML = p.appIdLine;
-
-    // Score
-    document.getElementById("ringNum").textContent = p.score.num;
-    document.getElementById("verdict").textContent = p.score.verdict;
-
-    const verdictEl = document.getElementById("verdict");
-    verdictEl.style.borderColor = p.score.color;
-    verdictEl.style.color = p.score.color;
-    verdictEl.style.background =
-      p.score.verdict === "LOW RISK" ? "rgba(34,197,94,.08)" :
-      p.score.verdict === "MEDIUM RISK" ? "rgba(245,158,11,.08)" :
+    const pill = $("scoreVerdict");
+    pill.textContent = current.verdict;
+    pill.style.borderColor = color;
+    pill.style.color = color;
+    pill.style.background =
+      color === "#22c55e" ? "rgba(34,197,94,.08)" :
+      color === "#f59e0b" ? "rgba(245,158,11,.08)" :
       "rgba(239,68,68,.08)";
-
-    const ringNumEl = document.getElementById("ringNum");
-    ringNumEl.style.color = p.score.color;
-
-    const ring = document.getElementById("ringProgress");
-    ring.setAttribute("stroke", p.score.ring);
-    ring.setAttribute("stroke-dashoffset", dashOffsetFromScore(p.score.num).toFixed(1));
-
-    // Recommendation
-    const rec = document.getElementById("recText");
-    rec.innerHTML = p.rec;
-    rec.style.borderLeftColor = p.score.color;
-
-    // Summary rows
-    document.getElementById("sumMortgage").textContent = p.summary.mortgage.val;
-    setDot(document.getElementById("dotMortgage"), p.summary.mortgage.dot);
-
-    document.getElementById("sumHistory").textContent = p.summary.history.val;
-    setDot(document.getElementById("dotHistory"), p.summary.history.dot);
-
-    document.getElementById("sumLtv").textContent = p.summary.ltv.val;
-    setDot(document.getElementById("dotLtv"), p.summary.ltv.dot);
-
-    document.getElementById("sumProv").textContent = p.summary.prov.val;
-    setDot(document.getElementById("dotProv"), p.summary.prov.dot);
-
-    document.getElementById("sumProp").textContent = p.summary.prop.val;
-    setDot(document.getElementById("dotProp"), p.summary.prop.dot);
-
-    document.getElementById("sumPay").textContent = p.summary.pay.val;
-    setDot(document.getElementById("dotPay"), p.summary.pay.dot);
-
-    // Details
-    document.getElementById("dName").textContent = p.profile.name;
-    document.getElementById("dAge").textContent = p.profile.age;
-    document.getElementById("dEmp").textContent = p.profile.emp;
-    document.getElementById("dInc").textContent = p.profile.inc;
-    document.getElementById("dProv").textContent = p.profile.prov;
-
-    document.getElementById("dMort").textContent = p.mortgage.amt;
-    document.getElementById("dVal").textContent = p.mortgage.val;
-    document.getElementById("dLtv").textContent = p.mortgage.ltv;
-    document.getElementById("dType").textContent = p.mortgage.type;
-    document.getElementById("dRate").textContent = p.mortgage.rate;
-
-    document.getElementById("dProp").textContent = p.property.type;
-    document.getElementById("dProv2").textContent = p.property.prov;
-    document.getElementById("dHist").textContent = p.property.hist;
-
-    document.getElementById("dDpd").textContent = p.payment.dpd;
-    document.getElementById("dLate").textContent = p.payment.late;
-    document.getElementById("dOsfi").textContent = p.payment.osfi;
-
-    // Risk factor blocks
-    const rfMap = [
-      ["Mortgage", "mortgage"],
-      ["History", "history"],
-      ["Ltv", "ltv"],
-      ["Prov", "prov"],
-      ["Prop", "prop"],
-      ["Pay", "pay"]
-    ];
-
-    rfMap.forEach(([suffix, k]) => {
-      const cfg = p.rf[k];
-      const block = document.getElementById("rf" + suffix);
-      const valEl = document.getElementById("rf" + suffix + "Val");
-      const noteEl = document.getElementById("rf" + suffix + "Note");
-      const barEl = document.getElementById("rf" + suffix + "Bar");
-
-      setRFBlock(block, cfg.level);
-      valEl.textContent = cfg.val;
-      valEl.style.color = levelColor(cfg.level);
-      noteEl.innerHTML = cfg.note;
-      barEl.style.width = cfg.bar + "%";
-      barEl.style.background = levelColor(cfg.level);
-    });
   }
 
-  // Wire select
-  const sel = document.getElementById("personSelect");
-  sel.addEventListener("change", (e) => applyPerson(e.target.value));
+  function setDot(elId, level){
+    const el = $(elId);
+    el.classList.remove("dot-low", "dot-mid", "dot-high");
+    el.classList.add(level);
+  }
 
-  // Default
-  applyPerson(sel.value);
+  function applyProfile(p){
+    current = p;
+
+    $("appName").textContent = p.name;
+    $("appMeta").innerHTML = `${p.appId} &nbsp;|&nbsp; AGE ${p.age} &nbsp;|&nbsp; ${p.job} &nbsp;|&nbsp; ${p.province}`;
+
+    $("recText").textContent = p.rec;
+    setScore(p.score, p.scoreColor);
+
+    $("sumAmt").textContent = p.mortgageAmount;
+    $("sumHist").textContent = p.mortgageHistory;
+    $("sumLtv").textContent = p.ltv;
+    $("sumProv").textContent = p.province;
+    $("sumProp").textContent = p.propertyType;
+    $("sumPay").textContent = p.paymentHistory;
+
+    setDot("dotAmt", p.score >= 70 ? "dot-low" : p.score >= 45 ? "dot-mid" : "dot-high");
+    setDot("dotHist", p.mortgageHistory.toLowerCase().includes("1st") ? "dot-low" : "dot-high");
+    setDot("dotLtv", parseFloat(p.ltv) <= 80 ? "dot-low" : parseFloat(p.ltv) <= 90 ? "dot-mid" : "dot-high");
+    setDot("dotProv", (p.province === "Ontario" || p.province === "British Columbia") ? "dot-mid" : "dot-low");
+    setDot("dotProp", p.propertyType.toLowerCase().includes("condo") ? "dot-mid" : "dot-low");
+    setDot("dotPay", p.paymentHistory.toLowerCase().includes("clean") ? "dot-low" : p.paymentHistory.toLowerCase().includes("minor") ? "dot-mid" : "dot-high");
+
+    $("dName").textContent = p.name;
+    $("dAge").textContent = `${p.age} years`;
+    $("dJob").textContent = p.job;
+    $("dInc").textContent = p.income;
+    $("dProv").textContent = p.province;
+
+    $("dAmt").textContent = p.mortgageAmount;
+    $("dVal").textContent = p.propertyValue;
+    $("dLtv").textContent = p.ltv;
+    $("dType").textContent = p.mType;
+    $("dRate").textContent = p.rate;
+
+    $("dProp").textContent = p.propertyType;
+    $("dProv2").textContent = p.province;
+    $("dHist").textContent = p.mortgageHistory;
+
+    $("dDpd").textContent = p.dpd;
+    $("dLate").textContent = p.late12;
+    $("dOsfi").textContent = p.osfi;
+
+    $("rfAmt").textContent = p.mortgageAmount;
+    $("rfHist").textContent = p.mortgageHistory;
+    $("rfLtv").textContent = p.ltv;
+    $("rfProv").textContent = p.province;
+    $("rfProp").textContent = p.propertyType;
+    $("rfPay").textContent = p.paymentHistory;
+
+    $("rfAmt").style.color  = p.score >= 70 ? "#22c55e" : p.score >= 45 ? "#f59e0b" : "#ef4444";
+    $("rfHist").style.color = p.mortgageHistory.toLowerCase().includes("1st") ? "#22c55e" : "#ef4444";
+    $("rfLtv").style.color  = parseFloat(p.ltv) <= 80 ? "#22c55e" : parseFloat(p.ltv) <= 90 ? "#f59e0b" : "#ef4444";
+    $("rfProv").style.color = (p.province === "Ontario" || p.province === "British Columbia") ? "#f59e0b" : "#22c55e";
+    $("rfProp").style.color = p.propertyType.toLowerCase().includes("condo") ? "#f59e0b" : "#22c55e";
+    $("rfPay").style.color  = p.paymentHistory.toLowerCase().includes("clean") ? "#22c55e" : p.paymentHistory.toLowerCase().includes("minor") ? "#f59e0b" : "#ef4444";
+
+    $("rfAmtBar").style.width = p.score >= 70 ? "20%" : p.score >= 45 ? "55%" : "80%";
+    $("rfAmtBar").style.background = $("rfAmt").style.color;
+
+    $("rfHistBar").style.width = p.mortgageHistory.toLowerCase().includes("1st") ? "20%" : "75%";
+    $("rfHistBar").style.background = $("rfHist").style.color;
+
+    $("rfLtvBar").style.width = `${clamp(parseFloat(p.ltv), 10, 100)}%`;
+    $("rfLtvBar").style.background = $("rfLtv").style.color;
+
+    $("rfProvBar").style.width = (p.province === "Ontario" || p.province === "British Columbia") ? "50%" : "20%";
+    $("rfProvBar").style.background = $("rfProv").style.color;
+
+    $("rfPropBar").style.width = p.propertyType.toLowerCase().includes("condo") ? "50%" : "20%";
+    $("rfPropBar").style.background = $("rfProp").style.color;
+
+    $("rfPayBar").style.width = p.paymentHistory.toLowerCase().includes("clean") ? "20%" : p.paymentHistory.toLowerCase().includes("minor") ? "50%" : "80%";
+    $("rfPayBar").style.background = $("rfPay").style.color;
+
+    $("decisionAppId").textContent = p.appId;
+    $("decisionName").textContent = p.name;
+  }
+
+  const modal = $("decisionModal");
+  const chip = $("decisionChip");
+  const finalizeBtn = $("finalizeBtn");
+  const conditionsField = $("conditionsField");
+  const notes = $("decisionNotes");
+  const conditions = $("decisionConditions");
+
+  function openDecision(type){
+    modal.classList.add("show");
+    finalizeBtn.disabled = false;
+
+    if (type === "approve"){
+      $("decisionTitle").textContent = "DECISION: APPROVAL";
+      chip.textContent = "APPROVED";
+      chip.className = "chip approve";
+      finalizeBtn.className = "btn btn-a";
+      finalizeBtn.textContent = "FINALIZE APPROVAL";
+      conditionsField.style.display = "block";
+
+      if (!conditions.value) {
+        conditions.value = "Stress test: standard variable-rate scenario.\nVerify income: most recent pay stubs + employment letter.\nAppraisal: standard policy for flagged regions.";
+      }
+    } else if (type === "decline"){
+      $("decisionTitle").textContent = "DECISION: DECLINE";
+      chip.textContent = "DECLINED";
+      chip.className = "chip decline";
+      finalizeBtn.className = "btn btn-d";
+      finalizeBtn.textContent = "FINALIZE DECLINE";
+      conditionsField.style.display = "none";
+
+      if (!notes.value) {
+        notes.value = "Decline rationale: elevated delinquency / LTV band / insufficient compensating factors.";
+      }
+    } else {
+      $("decisionTitle").textContent = "DECISION: ESCALATION";
+      chip.textContent = "ESCALATED";
+      chip.className = "chip escalate";
+      finalizeBtn.className = "btn btn-e";
+      finalizeBtn.textContent = "SUBMIT FOR REVIEW";
+      conditionsField.style.display = "block";
+
+      if (!conditions.value) {
+        conditions.value = "Request senior underwriter review.\nAdd property appraisal.\nRun enhanced verification for income stability and liabilities.";
+      }
+    }
+
+    $("decisionAppId").textContent = current.appId;
+    $("decisionName").textContent = current.name;
+  }
+
+  function closeDecision(){
+    modal.classList.remove("show");
+  }
+
+  modal.addEventListener("click", (e) => {
+    if (e.target === modal) closeDecision();
+  });
+
+  $("closeModalBtn").addEventListener("click", closeDecision);
+  $("backBtn").addEventListener("click", closeDecision);
+
+  finalizeBtn.addEventListener("click", () => {
+    const stamp = new Date().toLocaleString();
+
+    if (!notes.value.includes("[Audit]")) {
+      notes.value += `\n\n[Audit] Action finalized at ${stamp}.`;
+    }
+
+    if (chip.classList.contains("approve")) {
+      finalizeBtn.textContent = "submitted";
+    } else if (chip.classList.contains("decline")) {
+      finalizeBtn.textContent = "declined";
+    } else {
+      finalizeBtn.textContent = "escalated";
+    }
+
+    finalizeBtn.disabled = true;
+  });
+
+  $("approveBtn").addEventListener("click", () => {
+    notes.value = "";
+    conditions.value = "";
+    openDecision("approve");
+  });
+
+  $("declineBtn").addEventListener("click", () => {
+    notes.value = "";
+    conditions.value = "";
+    openDecision("decline");
+  });
+
+  $("escalateBtn").addEventListener("click", () => {
+    notes.value = "";
+    conditions.value = "";
+    openDecision("escalate");
+  });
+
+  $("profileSel").addEventListener("change", (e) => {
+    notes.value = "";
+    conditions.value = "";
+    closeDecision();
+    applyProfile(profiles[e.target.value]);
+  });
+
+  applyProfile(profiles.john);
 </script>
-
 </body>
 </html>
+
+
