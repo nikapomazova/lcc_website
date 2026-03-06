@@ -1,0 +1,621 @@
+import { useState, useEffect } from "react";
+
+const applications = [
+  {
+    id: "APP-2026-0847",
+    name: "John Doe",
+    age: 34,
+    province: "Ontario",
+    employment: "Software Engineer",
+    income: 142000,
+    propertyValue: 780000,
+    mortgageAmount: 520000,
+    mortgageType: "Fixed",
+    mortgageHistory: 1,
+    propertyType: "Condominium",
+    daysPassDue: 0,
+    latePayments: 0,
+    interestRate: 5.1,
+    status: "pending",
+    aiScore: 82,
+    aiVerdict: "LOW RISK",
+    scoreColor: "#22c55e",
+    factors: [
+      { label: "Mortgage Amount", value: "$520,000", risk: "low", note: "Above $500K threshold — zero high risk in this bracket historically" },
+      { label: "Mortgage History", value: "1st mortgage", risk: "low", note: "First-time borrowers are safest cohort (10.7% HR rate)" },
+      { label: "LTV Ratio", value: "66.7%", risk: "low", note: "Within 65-80% moderate band — 4.8% high risk rate" },
+      { label: "Province", value: "Ontario", risk: "medium", note: "Ontario elevated at 18.1% HR — monitor ongoing" },
+      { label: "Property Type", value: "Condominium", risk: "medium", note: "Condos carry 18.5% HR rate — Toronto/Vancouver value risk" },
+      { label: "Payment History", value: "Clean", risk: "low", note: "No days past due, no late payments" },
+    ],
+    recommendation: "APPROVE — Strong income, clean payment history and mortgage amount above the $500K safety threshold. Ontario/condo exposure noted; recommend standard variable-rate stress test.",
+  },
+  {
+    id: "APP-2026-0851",
+    name: "Mary Jane",
+    age: 47,
+    province: "New Brunswick",
+    employment: "Operations Manager",
+    income: 98000,
+    propertyValue: 410000,
+    mortgageAmount: 185000,
+    mortgageType: "Variable",
+    mortgageHistory: 2,
+    propertyType: "Semi-Detached House",
+    daysPassDue: 18,
+    latePayments: 1,
+    interestRate: 5.6,
+    status: "pending",
+    aiScore: 31,
+    aiVerdict: "HIGH RISK",
+    scoreColor: "#ef4444",
+    factors: [
+      { label: "Mortgage Amount", value: "$185,000", risk: "high", note: "Sub-$200K — 64.5% high risk rate in this bracket. Strongest single predictor (r = -0.41)" },
+      { label: "Mortgage History", value: "2nd mortgage", risk: "high", note: "2nd mortgage holders have 21.2% HR — near double first-time rate" },
+      { label: "LTV Ratio", value: "45.1%", risk: "high", note: "LTV Paradox: <50% bucket has 61.4% HR — small paid-down mortgage, cash-flow stressed" },
+      { label: "Province", value: "New Brunswick", risk: "high", note: "Highest HR province at 18.2%" },
+      { label: "Property Type", value: "Semi-Detached", risk: "high", note: "18.6% HR rate — highest of all property types" },
+      { label: "Payment History", value: "18 DPD, 1 late", risk: "medium", note: "Early delinquency signal — watch list classification" },
+    ],
+    recommendation: "FLAG FOR SENIOR REVIEW — Multiple compounding risk factors identified. Sub-$200K mortgage, 2nd mortgage holder, New Brunswick province, semi-detached property. 18 DPD on variable rate is an early delinquency signal. Do not approve without senior underwriter sign-off and detailed income stress test.",
+  },
+  {
+    id: "APP-2026-0859",
+    name: "James Bond",
+    age: 55,
+    province: "Alberta",
+    employment: "Physician",
+    income: 149000,
+    propertyValue: 920000,
+    mortgageAmount: 680000,
+    mortgageType: "Fixed",
+    mortgageHistory: 3,
+    propertyType: "Detached House",
+    daysPassDue: 0,
+    latePayments: 0,
+    interestRate: 4.9,
+    status: "pending",
+    aiScore: 91,
+    aiVerdict: "LOW RISK",
+    scoreColor: "#22c55e",
+    factors: [
+      { label: "Mortgage Amount", value: "$680,000", risk: "low", note: "Well above $500K — zero historical defaults in this bracket" },
+      { label: "Mortgage History", value: "3rd mortgage", risk: "low", note: "Experienced borrower; 17.2% HR rate — moderate but stable" },
+      { label: "LTV Ratio", value: "73.9%", risk: "low", note: "Moderate band — adequate equity buffer against value corrections" },
+      { label: "Province", value: "Alberta", risk: "low", note: "Safest province at 11.5% HR rate" },
+      { label: "Property Type", value: "Detached House", risk: "low", note: "13.0% HR — second safest property type" },
+      { label: "Payment History", value: "Clean", risk: "low", note: "Zero DPD, zero late payments — fully performing" },
+    ],
+    recommendation: "APPROVE — Exceptional risk profile. High income, large mortgage above safety threshold, clean history, safest province and property type combination. Fast-track processing recommended.",
+  },
+];
+
+const riskColor = (risk) =>
+  risk === "high" ? "#ef4444" : risk === "medium" ? "#f59e0b" : "#22c55e";
+const riskBg = (risk) =>
+  risk === "high" ? "rgba(239,68,68,0.08)" : risk === "medium" ? "rgba(245,158,11,0.08)" : "rgba(34,197,94,0.08)";
+
+export default function UnderwriterDashboard() {
+  const [selected, setSelected] = useState(0);
+  const [decisions, setDecisions] = useState({});
+  const [animating, setAnimating] = useState(false);
+  const [scoreDisplay, setScoreDisplay] = useState(0);
+  const [activeTab, setActiveTab] = useState("score");
+
+  const app = applications[selected];
+
+  useEffect(() => {
+    setAnimating(true);
+    setScoreDisplay(0);
+    const target = app.aiScore;
+    const duration = 900;
+    const steps = 40;
+    const increment = target / steps;
+    let current = 0;
+    const timer = setInterval(() => {
+      current += increment;
+      if (current >= target) {
+        setScoreDisplay(target);
+        clearInterval(timer);
+      } else {
+        setScoreDisplay(Math.floor(current));
+      }
+    }, duration / steps);
+    setTimeout(() => setAnimating(false), 300);
+    return () => clearInterval(timer);
+  }, [selected]);
+
+  const decide = (verdict) => {
+    setDecisions((d) => ({ ...d, [app.id]: verdict }));
+  };
+
+  const circumference = 2 * Math.PI * 54;
+  const offset = circumference - (scoreDisplay / 100) * circumference;
+
+  return (
+    <div style={{
+      fontFamily: "'DM Mono', 'IBM Plex Mono', 'Courier New', monospace",
+      background: "#0a0e1a",
+      minHeight: "100vh",
+      color: "#e2e8f0",
+      display: "flex",
+      flexDirection: "column",
+    }}>
+      {/* Top bar */}
+      <div style={{
+        background: "#0d1221",
+        borderBottom: "1px solid #1e293b",
+        padding: "12px 24px",
+        display: "flex",
+        alignItems: "center",
+        justifyContent: "space-between",
+      }}>
+        <div style={{ display: "flex", alignItems: "center", gap: 16 }}>
+          <div style={{
+            background: "#c00000",
+            color: "#fff",
+            fontWeight: 700,
+            fontSize: 14,
+            padding: "4px 10px",
+            letterSpacing: 2,
+          }}>RED</div>
+          <span style={{ color: "#64748b", fontSize: 12, letterSpacing: 1 }}>BANK</span>
+          <span style={{ color: "#1e293b", fontSize: 12 }}>|</span>
+          <span style={{ color: "#94a3b8", fontSize: 11, letterSpacing: 1 }}>AI UNDERWRITING PLATFORM</span>
+          <span style={{
+            background: "rgba(34,197,94,0.1)",
+            border: "1px solid rgba(34,197,94,0.3)",
+            color: "#22c55e",
+            fontSize: 9,
+            padding: "2px 8px",
+            letterSpacing: 1,
+          }}>● LIVE</span>
+        </div>
+        <div style={{ display: "flex", gap: 20, fontSize: 11, color: "#475569" }}>
+          <span>UNDERWRITER: J. MORRISON</span>
+          <span style={{ color: "#1e293b" }}>|</span>
+          <span>SESSION: 2026-03-05 14:22</span>
+        </div>
+      </div>
+
+      <div style={{ display: "flex", flex: 1, overflow: "hidden" }}>
+        {/* Left panel — queue */}
+        <div style={{
+          width: 280,
+          background: "#0d1221",
+          borderRight: "1px solid #1e293b",
+          display: "flex",
+          flexDirection: "column",
+        }}>
+          <div style={{
+            padding: "16px 20px 12px",
+            borderBottom: "1px solid #1e293b",
+            fontSize: 10,
+            color: "#475569",
+            letterSpacing: 2,
+          }}>
+            APPLICATION QUEUE
+            <span style={{
+              float: "right",
+              background: "#c00000",
+              color: "#fff",
+              fontSize: 9,
+              padding: "1px 6px",
+            }}>{applications.length}</span>
+          </div>
+
+          {applications.map((a, i) => {
+            const dec = decisions[a.id];
+            return (
+              <div
+                key={a.id}
+                onClick={() => setSelected(i)}
+                style={{
+                  padding: "14px 20px",
+                  cursor: "pointer",
+                  borderBottom: "1px solid #111827",
+                  background: selected === i ? "rgba(192,0,0,0.08)" : "transparent",
+                  borderLeft: selected === i ? "3px solid #c00000" : "3px solid transparent",
+                  transition: "all 0.15s",
+                }}
+              >
+                <div style={{ display: "flex", justifyContent: "space-between", alignItems: "flex-start" }}>
+                  <div>
+                    <div style={{ fontSize: 12, fontWeight: 600, color: selected === i ? "#f1f5f9" : "#94a3b8" }}>
+                      {a.name}
+                    </div>
+                    <div style={{ fontSize: 10, color: "#475569", marginTop: 3 }}>{a.id}</div>
+                    <div style={{ fontSize: 10, color: "#475569", marginTop: 2 }}>{a.province}</div>
+                  </div>
+                  <div style={{ textAlign: "right" }}>
+                    <div style={{
+                      fontSize: 10,
+                      fontWeight: 700,
+                      color: a.scoreColor,
+                      letterSpacing: 0.5,
+                    }}>{a.aiVerdict}</div>
+                    <div style={{ fontSize: 11, color: a.scoreColor, marginTop: 2 }}>{a.aiScore}/100</div>
+                    {dec && (
+                      <div style={{
+                        fontSize: 9,
+                        color: dec === "APPROVED" ? "#22c55e" : dec === "DECLINED" ? "#ef4444" : "#f59e0b",
+                        marginTop: 4,
+                        letterSpacing: 1,
+                      }}>● {dec}</div>
+                    )}
+                  </div>
+                </div>
+              </div>
+            );
+          })}
+
+          <div style={{ flex: 1 }} />
+          <div style={{
+            padding: "16px 20px",
+            borderTop: "1px solid #1e293b",
+            fontSize: 10,
+            color: "#475569",
+          }}>
+            <div style={{ marginBottom: 6 }}>MODEL VERSION: v2.3.1</div>
+            <div style={{ marginBottom: 6 }}>TRAINING DATA: 971 records</div>
+            <div style={{ color: "#c00000" }}>⚠ HUMAN APPROVAL REQUIRED</div>
+          </div>
+        </div>
+
+        {/* Main panel */}
+        <div style={{ flex: 1, display: "flex", flexDirection: "column", overflow: "auto" }}>
+          {/* App header */}
+          <div style={{
+            padding: "20px 28px",
+            borderBottom: "1px solid #1e293b",
+            background: "#0d1221",
+            display: "flex",
+            justifyContent: "space-between",
+            alignItems: "center",
+          }}>
+            <div>
+              <div style={{ fontSize: 18, fontWeight: 700, color: "#f1f5f9", letterSpacing: 0.5 }}>
+                {app.name}
+              </div>
+              <div style={{ fontSize: 11, color: "#475569", marginTop: 4, letterSpacing: 1 }}>
+                {app.id} · AGE {app.age} · {app.employment} · {app.province}
+              </div>
+            </div>
+            <div style={{ display: "flex", gap: 8 }}>
+              {decisions[app.id] ? (
+                <div style={{
+                  padding: "8px 20px",
+                  fontSize: 12,
+                  fontWeight: 700,
+                  letterSpacing: 1,
+                  color: decisions[app.id] === "APPROVED" ? "#22c55e" : decisions[app.id] === "DECLINED" ? "#ef4444" : "#f59e0b",
+                  border: `1px solid`,
+                  borderColor: decisions[app.id] === "APPROVED" ? "#22c55e" : decisions[app.id] === "DECLINED" ? "#ef4444" : "#f59e0b",
+                }}>
+                  ✓ {decisions[app.id]}
+                </div>
+              ) : (
+                <>
+                  <button onClick={() => decide("APPROVED")} style={{
+                    padding: "8px 18px", fontSize: 11, fontWeight: 700,
+                    background: "rgba(34,197,94,0.1)", border: "1px solid rgba(34,197,94,0.4)",
+                    color: "#22c55e", cursor: "pointer", letterSpacing: 1,
+                    fontFamily: "inherit",
+                  }}>APPROVE</button>
+                  <button onClick={() => decide("REVIEW")} style={{
+                    padding: "8px 18px", fontSize: 11, fontWeight: 700,
+                    background: "rgba(245,158,11,0.1)", border: "1px solid rgba(245,158,11,0.4)",
+                    color: "#f59e0b", cursor: "pointer", letterSpacing: 1,
+                    fontFamily: "inherit",
+                  }}>ESCALATE</button>
+                  <button onClick={() => decide("DECLINED")} style={{
+                    padding: "8px 18px", fontSize: 11, fontWeight: 700,
+                    background: "rgba(239,68,68,0.1)", border: "1px solid rgba(239,68,68,0.4)",
+                    color: "#ef4444", cursor: "pointer", letterSpacing: 1,
+                    fontFamily: "inherit",
+                  }}>DECLINE</button>
+                </>
+              )}
+            </div>
+          </div>
+
+          {/* Tabs */}
+          <div style={{
+            display: "flex",
+            borderBottom: "1px solid #1e293b",
+            background: "#0a0e1a",
+            padding: "0 28px",
+          }}>
+            {["score", "details", "factors"].map((tab) => (
+              <button key={tab} onClick={() => setActiveTab(tab)} style={{
+                padding: "12px 20px",
+                fontSize: 11,
+                letterSpacing: 1,
+                fontFamily: "inherit",
+                background: "none",
+                border: "none",
+                borderBottom: activeTab === tab ? "2px solid #c00000" : "2px solid transparent",
+                color: activeTab === tab ? "#f1f5f9" : "#475569",
+                cursor: "pointer",
+                textTransform: "uppercase",
+              }}>
+                {tab === "score" ? "AI RISK SCORE" : tab === "details" ? "APPLICATION DETAILS" : "RISK FACTORS"}
+              </button>
+            ))}
+          </div>
+
+          <div style={{ padding: "24px 28px", flex: 1 }}>
+            {/* AI SCORE TAB */}
+            {activeTab === "score" && (
+              <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 20 }}>
+                {/* Score ring */}
+                <div style={{
+                  background: "#0d1221",
+                  border: "1px solid #1e293b",
+                  padding: 28,
+                  display: "flex",
+                  flexDirection: "column",
+                  alignItems: "center",
+                }}>
+                  <div style={{ fontSize: 10, color: "#475569", letterSpacing: 2, marginBottom: 20 }}>
+                    AI COMPOSITE RISK SCORE
+                  </div>
+                  <svg width={140} height={140} style={{ transform: "rotate(-90deg)" }}>
+                    <circle cx={70} cy={70} r={54} fill="none" stroke="#1e293b" strokeWidth={10} />
+                    <circle
+                      cx={70} cy={70} r={54}
+                      fill="none"
+                      stroke={app.scoreColor}
+                      strokeWidth={10}
+                      strokeDasharray={circumference}
+                      strokeDashoffset={offset}
+                      strokeLinecap="butt"
+                      style={{ transition: "stroke-dashoffset 0.9s ease" }}
+                    />
+                  </svg>
+                  <div style={{
+                    marginTop: -90,
+                    marginBottom: 50,
+                    textAlign: "center",
+                    position: "relative",
+                    zIndex: 1,
+                  }}>
+                    <div style={{ fontSize: 36, fontWeight: 700, color: app.scoreColor }}>
+                      {scoreDisplay}
+                    </div>
+                    <div style={{ fontSize: 10, color: "#475569", letterSpacing: 1 }}>/ 100</div>
+                  </div>
+                  <div style={{
+                    fontSize: 14,
+                    fontWeight: 700,
+                    letterSpacing: 2,
+                    color: app.scoreColor,
+                    padding: "6px 20px",
+                    border: `1px solid ${app.scoreColor}`,
+                    background: `${app.scoreColor}15`,
+                  }}>
+                    {app.aiVerdict}
+                  </div>
+                  <div style={{
+                    marginTop: 20,
+                    fontSize: 9,
+                    color: "#334155",
+                    textAlign: "center",
+                    lineHeight: 1.6,
+                  }}>
+                    Logistic regression model · 6 input variables<br />
+                    Trained on 971 historical records<br />
+                    Correlation threshold: p &lt; 0.05
+                  </div>
+                </div>
+
+                {/* Recommendation */}
+                <div style={{ display: "flex", flexDirection: "column", gap: 16 }}>
+                  <div style={{
+                    background: "#0d1221",
+                    border: "1px solid #1e293b",
+                    padding: 20,
+                  }}>
+                    <div style={{ fontSize: 10, color: "#475569", letterSpacing: 2, marginBottom: 12 }}>
+                      AI RECOMMENDATION
+                    </div>
+                    <div style={{
+                      fontSize: 11,
+                      color: "#cbd5e1",
+                      lineHeight: 1.8,
+                      borderLeft: `3px solid ${app.scoreColor}`,
+                      paddingLeft: 14,
+                    }}>
+                      {app.recommendation}
+                    </div>
+                  </div>
+
+                  <div style={{
+                    background: "#0d1221",
+                    border: "1px solid #1e293b",
+                    padding: 20,
+                  }}>
+                    <div style={{ fontSize: 10, color: "#475569", letterSpacing: 2, marginBottom: 12 }}>
+                      RISK FACTOR SUMMARY
+                    </div>
+                    {app.factors.map((f, i) => (
+                      <div key={i} style={{
+                        display: "flex",
+                        justifyContent: "space-between",
+                        alignItems: "center",
+                        padding: "6px 0",
+                        borderBottom: i < app.factors.length - 1 ? "1px solid #111827" : "none",
+                      }}>
+                        <span style={{ fontSize: 11, color: "#64748b" }}>{f.label}</span>
+                        <div style={{ display: "flex", alignItems: "center", gap: 8 }}>
+                          <span style={{ fontSize: 11, color: "#94a3b8" }}>{f.value}</span>
+                          <div style={{
+                            width: 8, height: 8,
+                            background: riskColor(f.risk),
+                            borderRadius: "50%",
+                          }} />
+                        </div>
+                      </div>
+                    ))}
+                  </div>
+                </div>
+              </div>
+            )}
+
+            {/* DETAILS TAB */}
+            {activeTab === "details" && (
+              <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 20 }}>
+                {[
+                  {
+                    title: "BORROWER PROFILE",
+                    fields: [
+                      ["Full Name", app.name],
+                      ["Age", `${app.age} years`],
+                      ["Employment", app.employment],
+                      ["Annual Income", `$${app.income.toLocaleString()}`],
+                      ["Province", app.province],
+                    ]
+                  },
+                  {
+                    title: "MORTGAGE DETAILS",
+                    fields: [
+                      ["Mortgage Amount", `$${app.mortgageAmount.toLocaleString()}`],
+                      ["Property Value", `$${app.propertyValue.toLocaleString()}`],
+                      ["LTV Ratio", `${((app.mortgageAmount / app.propertyValue) * 100).toFixed(1)}%`],
+                      ["Mortgage Type", app.mortgageType],
+                      ["Interest Rate", `${app.interestRate}%`],
+                    ]
+                  },
+                  {
+                    title: "PROPERTY DETAILS",
+                    fields: [
+                      ["Property Type", app.propertyType],
+                      ["Province", app.province],
+                      ["Mortgage History", `#${app.mortgageHistory} mortgage`],
+                    ]
+                  },
+                  {
+                    title: "PAYMENT HISTORY",
+                    fields: [
+                      ["Days Past Due", app.daysPassDue === 0 ? "None" : `${app.daysPassDue} days`],
+                      ["Late Payments (12M)", app.latePayments === 0 ? "None" : app.latePayments],
+                      ["OSFI Classification", app.daysPassDue === 0 && app.latePayments === 0 ? "Performing" : app.daysPassDue >= 90 ? "Non-Performing" : app.daysPassDue >= 30 ? "Substandard" : "Early Delinquency"],
+                    ]
+                  }
+                ].map((section, si) => (
+                  <div key={si} style={{
+                    background: "#0d1221",
+                    border: "1px solid #1e293b",
+                    padding: 20,
+                  }}>
+                    <div style={{ fontSize: 10, color: "#475569", letterSpacing: 2, marginBottom: 14 }}>
+                      {section.title}
+                    </div>
+                    {section.fields.map(([label, val], fi) => (
+                      <div key={fi} style={{
+                        display: "flex",
+                        justifyContent: "space-between",
+                        padding: "7px 0",
+                        borderBottom: fi < section.fields.length - 1 ? "1px solid #111827" : "none",
+                      }}>
+                        <span style={{ fontSize: 11, color: "#475569" }}>{label}</span>
+                        <span style={{ fontSize: 11, color: "#e2e8f0", fontWeight: 500 }}>{val}</span>
+                      </div>
+                    ))}
+                  </div>
+                ))}
+              </div>
+            )}
+
+            {/* RISK FACTORS TAB */}
+            {activeTab === "factors" && (
+              <div style={{ display: "flex", flexDirection: "column", gap: 12 }}>
+                <div style={{
+                  background: "#0d1221",
+                  border: "1px solid #1e293b",
+                  padding: "12px 20px",
+                  fontSize: 10,
+                  color: "#475569",
+                  letterSpacing: 1,
+                  display: "flex",
+                  gap: 24,
+                }}>
+                  <span>MODEL: Logistic Regression  ·  P(default) = 1/(1 + e^-(β₀ + β₁X₁ + ... + β₆X₆))</span>
+                  <span style={{ marginLeft: "auto", color: "#334155" }}>
+                    ● LOW RISK &nbsp;|&nbsp; ● MEDIUM RISK &nbsp;|&nbsp; ● HIGH RISK
+                  </span>
+                </div>
+
+                {app.factors.map((f, i) => (
+                  <div key={i} style={{
+                    background: riskBg(f.risk),
+                    border: `1px solid ${riskColor(f.risk)}30`,
+                    padding: "16px 20px",
+                    display: "grid",
+                    gridTemplateColumns: "180px 140px 1fr",
+                    alignItems: "center",
+                    gap: 20,
+                    transition: "all 0.2s",
+                  }}>
+                    <div>
+                      <div style={{ fontSize: 10, color: "#475569", letterSpacing: 1, marginBottom: 4 }}>
+                        VARIABLE
+                      </div>
+                      <div style={{ fontSize: 13, fontWeight: 600, color: "#e2e8f0" }}>{f.label}</div>
+                    </div>
+                    <div>
+                      <div style={{ fontSize: 10, color: "#475569", letterSpacing: 1, marginBottom: 4 }}>
+                        VALUE
+                      </div>
+                      <div style={{ fontSize: 13, color: riskColor(f.risk), fontWeight: 600 }}>{f.value}</div>
+                    </div>
+                    <div>
+                      <div style={{ fontSize: 10, color: "#475569", letterSpacing: 1, marginBottom: 4 }}>
+                        AI ANALYSIS
+                      </div>
+                      <div style={{ fontSize: 11, color: "#94a3b8", lineHeight: 1.5 }}>{f.note}</div>
+                    </div>
+                    <div style={{
+                      position: "absolute",
+                      right: 0,
+                    }} />
+                    <div style={{
+                      gridColumn: "1/-1",
+                      height: 3,
+                      background: "#111827",
+                      borderRadius: 2,
+                      marginTop: 4,
+                    }}>
+                      <div style={{
+                        height: "100%",
+                        width: f.risk === "high" ? "85%" : f.risk === "medium" ? "50%" : "20%",
+                        background: riskColor(f.risk),
+                        borderRadius: 2,
+                        transition: "width 0.8s ease",
+                      }} />
+                    </div>
+                  </div>
+                ))}
+
+                <div style={{
+                  background: "#0d1221",
+                  border: "1px solid #c0000030",
+                  padding: 16,
+                  fontSize: 10,
+                  color: "#475569",
+                  letterSpacing: 0.5,
+                  lineHeight: 1.8,
+                }}>
+                  <span style={{ color: "#c00000", fontWeight: 700 }}>⚠ HUMAN-IN-THE-LOOP REQUIRED: </span>
+                  AI scoring is advisory only. All credit decisions must be reviewed and approved by a licensed underwriter. 
+                  Discriminatory lending safeguards active — proxy variable monitoring enabled. 
+                  Compliant with OSFI B-20 mortgage underwriting guidelines.
+                </div>
+              </div>
+            )}
+          </div>
+        </div>
+      </div>
+    </div>
+  );
+}
